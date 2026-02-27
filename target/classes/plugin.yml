@@ -1,0 +1,21 @@
+name: jsmn
+version: 1.0-SNAPSHOT
+main: com.jsmn.plugin.Main
+api-version: 1.20
+description: Run pupil-authored JavaScript files inside Minecraft.
+author: jsmn
+
+commands:
+  runscript:
+    description: Run a JavaScript file from the scripts folder.
+    usage: /runscript <filename>
+    permission: jsmn.runscript
+  listscripts:
+    description: List available JavaScript files.
+    usage: /listscripts
+    permission: jsmn.runscript
+
+permissions:
+  jsmn.runscript:
+    description: Allows running JavaScript files.
+    default: true
