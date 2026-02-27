@@ -1,0 +1,220 @@
+================================================================================
+  JSMN - JavaScript in Minecraft  |  User Guide
+================================================================================
+
+JSMN lets you write JavaScript files and run them directly inside Minecraft.
+Scripts can talk to the player, place blocks, build structures, and generate
+mazes, castles, rainbows, and more.
+
+--------------------------------------------------------------------------------
+  COMMANDS
+--------------------------------------------------------------------------------
+
+  /listscripts          (alias: /ls)
+      Lists all available .js files in the scripts folder.
+
+  /runscript <filename> (alias: /rs)
+      Runs a script from the scripts folder.
+      The .js extension is optional.
+
+      Examples:
+          /runscript hello
+          /runscript hello.js
+          /rs build_house
+
+Scripts are stored in:  plugins/jsmn/scripts/
+
+
+--------------------------------------------------------------------------------
+  THE PLAYER OBJECT
+--------------------------------------------------------------------------------
+
+Every script has access to a 'player' object that represents the person who
+ran the command.
+
+  player.getName()          Returns the player's username as a string.
+  player.sendMessage(text)  Sends a message to the player in chat.
+  player.getX()             Returns the player's X coordinate.
+  player.getY()             Returns the player's Y coordinate.
+  player.getZ()             Returns the player's Z coordinate.
+  player.getHealth()        Returns the player's current health points.
+
+Example:
+    player.sendMessage("Hello, " + player.getName() + "!");
+    player.sendMessage("You are at " + player.getX() + ", " + player.getY());
+
+
+--------------------------------------------------------------------------------
+  THE DRONE OBJECT
+--------------------------------------------------------------------------------
+
+The drone is a virtual builder. It starts at the player's position, facing
+the same direction as the player. You move the drone around and it places
+blocks wherever you tell it to. All movement and building commands can be
+chained together.
+
+-- Placing blocks --
+
+  drone.box(material)
+  drone.box(material, width, height, depth)
+      Places a solid box of blocks starting at the drone's position.
+      width = left/right, height = up/down, depth = forward
+
+  drone.box0(material, width, height, depth)
+      Places a hollow box (walls only, no floor or ceiling).
+
+  Example:
+      drone.box("OAK_PLANKS", 5, 3, 5);    // solid 5×3×5 box
+      drone.box0("STONE_BRICKS", 4, 4, 4); // hollow stone room
+
+-- Moving the drone --
+
+  drone.fwd()     / drone.fwd(n)    Move forward n blocks (default 1).
+  drone.back()    / drone.back(n)   Move backward n blocks.
+  drone.right()   / drone.right(n)  Move right n blocks.
+  drone.left()    / drone.left(n)   Move left n blocks.
+  drone.up()      / drone.up(n)     Move up n blocks.
+  drone.down()    / drone.down(n)   Move down n blocks.
+
+-- Turning the drone --
+
+  drone.turn()    / drone.turn(n)   Turn clockwise by n × 90 degrees (default 1).
+  drone.turnRight()                 Turn 90 degrees clockwise.
+  drone.turnLeft()                  Turn 90 degrees counter-clockwise.
+
+-- Chaining example --
+
+  drone.box("OAK_LOG", 1, 5, 1)   // place a pillar
+       .fwd(4)                     // move forward 4 blocks
+       .box("OAK_LOG", 1, 5, 1);  // place another pillar
+
+-- Saving and restoring positions --
+
+  drone.chkpt(name)   Save the drone's current position and direction.
+  drone.move(name)    Jump back to a saved position.
+
+  Example:
+      drone.chkpt("start");
+      drone.box("STONE", 3, 3, 3).fwd(5);
+      drone.move("start");         // back to where we began
+
+-- Sphere --
+
+  drone.sphere(material)
+  drone.sphere(material, radius)
+      Builds a solid sphere. Maximum radius: 64. Default radius: 10.
+
+  drone.sphere0(material)
+  drone.sphere0(material, radius)
+      Builds a hollow sphere (1 block thick shell).
+
+  Example:
+      drone.sphere("GLASS", 8);
+      drone.sphere0("SANDSTONE", 12);
+
+-- Maze --
+
+  drone.maze(material, cols, rows)
+  drone.maze(material, cols, rows, height)
+      Generates a random maze using recursive backtracking.
+      cols  = number of corridor cells wide
+      rows  = number of corridor cells deep
+      height = wall height in blocks (default 3)
+
+  Example:
+      drone.maze("COBBLESTONE", 10, 10);
+      drone.maze("BRICK", 8, 6, 4);
+
+-- Rainbow --
+
+  drone.rainbow()
+  drone.rainbow(radius)
+      Builds a rainbow arch in the vertical plane in front of the drone.
+      Default radius: 18. Minimum radius: 7.
+
+  Example:
+      drone.rainbow();
+      drone.rainbow(12);
+
+-- Castle --
+
+  drone.castle(material)
+  drone.castle(material, side, height)
+      Builds a medieval castle with curtain walls, battlements, four corner
+      towers, and a gate.
+      side   = inner wall length between towers (default 12, minimum 10)
+      height = curtain wall height (default 10, minimum 6)
+      Towers are always 4 blocks taller than the curtain walls.
+
+  Example:
+      drone.castle("STONE_BRICKS");
+      drone.castle("SANDSTONE", 16, 12);
+
+
+--------------------------------------------------------------------------------
+  SHORTHAND FUNCTIONS
+--------------------------------------------------------------------------------
+
+The most common drone commands are also available as direct functions so you
+do not need to type "drone." every time:
+
+  box(material, width, height, depth)
+  box0(material, width, height, depth)
+  sphere(material, radius)
+  sphere0(material, radius)
+  maze(material, cols, rows, height)
+  castle(material, side, height)
+  rainbow(radius)
+  turn(n)
+
+  Example:
+      box("DIRT", 3, 1, 3);
+      castle("OAK_PLANKS");
+
+
+--------------------------------------------------------------------------------
+  MATERIAL NAMES
+--------------------------------------------------------------------------------
+
+Materials use Minecraft's internal block names in UPPER_CASE. Some examples:
+
+  STONE            COBBLESTONE      STONE_BRICKS     SMOOTH_STONE
+  OAK_PLANKS       SPRUCE_PLANKS    DARK_OAK_PLANKS  BAMBOO_PLANKS
+  OAK_LOG          SPRUCE_LOG       BIRCH_LOG
+  SAND             SANDSTONE        RED_SANDSTONE
+  DIRT             GRASS_BLOCK      GRAVEL
+  GLASS            TINTED_GLASS
+  BRICKS           MOSSY_COBBLESTONE
+  GOLD_BLOCK       IRON_BLOCK       DIAMOND_BLOCK    EMERALD_BLOCK
+  OBSIDIAN         BEDROCK          NETHERRACK
+  SNOW_BLOCK       ICE              BLUE_ICE
+  WHITE_WOOL       ORANGE_WOOL      YELLOW_WOOL      LIME_WOOL
+  CYAN_WOOL        BLUE_WOOL        PURPLE_WOOL      RED_WOOL
+  WHITE_CONCRETE   GRAY_CONCRETE    BLACK_CONCRETE
+
+If an unknown material name is used, the block defaults to OAK_PLANKS.
+
+
+--------------------------------------------------------------------------------
+  EXAMPLE SCRIPTS
+--------------------------------------------------------------------------------
+
+-- hello.js --
+    player.sendMessage("Hello, " + player.getName() + "!");
+
+-- tower.js --
+    // Build a 3×10×3 stone tower with a glass top
+    drone.box("STONE_BRICKS", 3, 10, 3)
+         .up(10)
+         .box("GLASS", 3, 2, 3);
+
+-- row_of_pillars.js --
+    for (var i = 0; i < 5; i++) {
+        drone.box("OAK_LOG", 1, 5, 1).fwd(3);
+    }
+
+-- big_maze.js --
+    drone.maze("COBBLESTONE", 12, 12, 4);
+
+
+================================================================================

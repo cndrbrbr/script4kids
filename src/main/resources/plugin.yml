@@ -7,15 +7,19 @@ author: jsmn
 
 commands:
   runscript:
-    description: Run a JavaScript file from the scripts folder.
-    usage: /runscript <filename>
+    description: Run a JavaScript file from the scripts folder. The script can use the 'player' object (sendMessage, getName, getX/Y/Z, getHealth) and the 'drone' object to place blocks (box, sphere, maze, castle, rainbow) and move around the world.
+    usage: /<command> <filename>
+    aliases: [rs]
     permission: jsmn.runscript
+    permission-message: You do not have permission to run scripts.
   listscripts:
-    description: List available JavaScript files.
-    usage: /listscripts
+    description: List all available JavaScript files in the scripts folder.
+    usage: /<command>
+    aliases: [ls]
     permission: jsmn.runscript
+    permission-message: You do not have permission to list scripts.
 
 permissions:
   jsmn.runscript:
-    description: Allows running JavaScript files.
+    description: Allows running and listing JavaScript files.
     default: true
