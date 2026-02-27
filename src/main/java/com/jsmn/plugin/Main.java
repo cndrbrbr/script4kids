@@ -18,8 +18,12 @@ public class Main extends JavaPlugin {
 
         getCommand("runscript").setExecutor(new RunScriptCommand(scriptManager));
         getCommand("listscripts").setExecutor(new ListScriptsCommand(scriptManager));
-        getCommand("box").setExecutor(new BoxCommand(false));
-        getCommand("box0").setExecutor(new BoxCommand(true));
+        BoxCommand boxCmd  = new BoxCommand(false);
+        BoxCommand box0Cmd = new BoxCommand(true);
+        getCommand("box").setExecutor(boxCmd);
+        getCommand("box").setTabCompleter(boxCmd);
+        getCommand("box0").setExecutor(box0Cmd);
+        getCommand("box0").setTabCompleter(box0Cmd);
 
         getLogger().info("jsmn enabled.");
     }
