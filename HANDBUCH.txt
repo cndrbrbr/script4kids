@@ -22,6 +22,23 @@ mazes, castles, rainbows, and more.
           /runscript hello.js
           /rs build_house
 
+  /box <material> [width] [height] [depth]
+      Places a solid box of blocks at your current position, facing the
+      direction you are looking. All size arguments are optional and default
+      to 1.
+
+      Examples:
+          /box STONE_BRICKS
+          /box OAK_PLANKS 5 3 5
+
+  /box0 <material> [width] [height] [depth]
+      Places a hollow box (four walls, no floor or ceiling) at your current
+      position. Arguments work the same as /box.
+
+      Examples:
+          /box0 STONE_BRICKS 4 4 4
+          /box0 GLASS 6 3 6
+
 Scripts are stored in:  plugins/jsmn/scripts/
 
 

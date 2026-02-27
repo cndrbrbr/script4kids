@@ -3,5 +3,6 @@ com/jsmn/plugin/api/ConsoleAPI.class
 com/jsmn/plugin/Main.class
 com/jsmn/plugin/api/DroneAPI.class
 com/jsmn/plugin/commands/RunScriptCommand.class
+com/jsmn/plugin/commands/BoxCommand.class
 com/jsmn/plugin/api/PlayerAPI.class
 com/jsmn/plugin/ScriptManager.class

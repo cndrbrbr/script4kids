@@ -3,5 +3,6 @@
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/api/ConsoleAPI.java
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/api/DroneAPI.java
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/api/PlayerAPI.java
+/home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/BoxCommand.java
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/ListScriptsCommand.java
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/RunScriptCommand.java

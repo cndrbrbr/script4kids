@@ -1,5 +1,6 @@
 package com.jsmn.plugin;
 
+import com.jsmn.plugin.commands.BoxCommand;
 import com.jsmn.plugin.commands.ListScriptsCommand;
 import com.jsmn.plugin.commands.RunScriptCommand;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,6 +18,8 @@ public class Main extends JavaPlugin {
 
         getCommand("runscript").setExecutor(new RunScriptCommand(scriptManager));
         getCommand("listscripts").setExecutor(new ListScriptsCommand(scriptManager));
+        getCommand("box").setExecutor(new BoxCommand(false));
+        getCommand("box0").setExecutor(new BoxCommand(true));
 
         getLogger().info("jsmn enabled.");
     }

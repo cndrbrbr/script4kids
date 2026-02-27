@@ -18,6 +18,16 @@ commands:
     aliases: [ls]
     permission: jsmn.runscript
     permission-message: You do not have permission to list scripts.
+  box:
+    description: Place a solid box of blocks at your position. Dimensions default to 1×1×1 if not given.
+    usage: /<command> <material> [width] [height] [depth]
+    permission: jsmn.runscript
+    permission-message: You do not have permission to use this command.
+  box0:
+    description: Place a hollow box (walls only, no floor or ceiling) at your position.
+    usage: /<command> <material> [width] [height] [depth]
+    permission: jsmn.runscript
+    permission-message: You do not have permission to use this command.
 
 permissions:
   jsmn.runscript:
