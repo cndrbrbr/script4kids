@@ -677,6 +677,20 @@ Copy these into the scripts folder and run them with /runscript.
 
 --------------------------------------------------------------------------------
 
+-- twintower.js --
+
+    // Builds a large skyscraper modelled after the WTC Twin Towers design:
+    // a 100×100-block footprint with a 6-storey iron/glass lower section,
+    // then 30 upper floors each with an iron/glass facade and four central
+    // elevator shafts, topped with a quartz roof.
+    //
+    // Stand on open, flat ground before running — the tower is 181 blocks tall.
+    // Run it twice at different positions to get the full twin-tower effect.
+    //
+    // Based on Twintower23.js by UmaruDoma:
+    // https://github.com/UmaruDoma/Scriptcraft
+    /runscript twintower
+
 -- checkerboard.js --
 
     // Build a 10×10 checkerboard floor of two materials
