@@ -16,7 +16,9 @@ public class Main extends JavaPlugin {
 
         scriptManager = new ScriptManager(this);
 
-        getCommand("runscript").setExecutor(new RunScriptCommand(scriptManager));
+        RunScriptCommand runScriptCmd = new RunScriptCommand(scriptManager);
+        getCommand("runscript").setExecutor(runScriptCmd);
+        getCommand("runscript").setTabCompleter(runScriptCmd);
         getCommand("listscripts").setExecutor(new ListScriptsCommand(scriptManager));
         BoxCommand boxCmd  = new BoxCommand(false);
         BoxCommand box0Cmd = new BoxCommand(true);
