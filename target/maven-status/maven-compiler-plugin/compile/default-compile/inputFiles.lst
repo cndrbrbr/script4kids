@@ -9,4 +9,5 @@
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/MazeCommand.java
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/RainbowCommand.java
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/RunScriptCommand.java
+/home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/SaveScriptCommand.java
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/SphereCommand.java

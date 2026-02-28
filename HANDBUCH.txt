@@ -64,6 +64,7 @@ restart after updating the plugin JAR.
   CONTENTS
 ================================================================================
 
+  0. Personal Script Folders
   1. Chat Commands
   2. Writing Scripts
   3. The player Object
@@ -82,6 +83,28 @@ restart after updating the plugin JAR.
 
 
 ================================================================================
+  0. PERSONAL SCRIPT FOLDERS
+================================================================================
+
+Every player has a personal scripts folder on the server:
+
+    plugins/jsmn/scripts/<YourMinecraftName>/
+
+Scripts you save with /savescript go into your personal folder.
+Scripts placed there by an admin also belong to you.
+
+Shared scripts (accessible by everyone) are in:
+
+    plugins/jsmn/scripts/
+
+When you run /runscript hello, the plugin looks in your personal folder first.
+If nothing is found there it falls back to the shared folder.
+To run a script from another player's folder, prefix it with their name:
+
+    /runscript Steve/castle
+
+
+================================================================================
   1. CHAT COMMANDS
 ================================================================================
 
@@ -89,9 +112,26 @@ These commands can be typed directly into the Minecraft chat.
 
 --------------------------------------------------------------------------------
 
+  /savescript <name> <content>
+
+      Saves a JavaScript script to your personal scripts folder.
+      The name must contain only letters, numbers, underscores and hyphens.
+      Everything after the name is saved as the script content.
+
+      Your scripts are stored in:  plugins/jsmn/scripts/<YourName>/
+
+      Examples:
+          /savescript hello player.sendMessage("Hello!");
+          /savescript platform drone.down(1).box("STONE",9,1,9);
+
+      Tip: For longer scripts, write them in the editor and use the GUI
+      to upload them. /savescript is useful for quick one-liners.
+
+--------------------------------------------------------------------------------
+
   /listscripts                        (alias: /ls)
 
-      Lists all available .js script files.
+      Lists your personal scripts and all shared scripts.
 
       Example:
           /listscripts
@@ -101,13 +141,17 @@ These commands can be typed directly into the Minecraft chat.
   /runscript <filename>               (alias: /rs)
 
       Runs a script file. The .js extension is optional.
+      Looks in your personal folder first, then in the shared folder.
+      To run another player's script, use their name as a prefix.
 
       Examples:
-          /runscript hello
-          /runscript hello.js
-          /rs build_house
+          /runscript hello              -- runs your own hello.js
+          /runscript hello.js           -- same, extension is optional
+          /rs build_house               -- short alias
+          /runscript Steve/castle       -- runs Steve's castle.js
 
-      Scripts are stored in:  plugins/jsmn/scripts/
+      Shared scripts are in:   plugins/jsmn/scripts/
+      Your scripts are in:     plugins/jsmn/scripts/<YourName>/
 
 --------------------------------------------------------------------------------
 

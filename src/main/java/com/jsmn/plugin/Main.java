@@ -6,6 +6,7 @@ import com.jsmn.plugin.commands.ListScriptsCommand;
 import com.jsmn.plugin.commands.MazeCommand;
 import com.jsmn.plugin.commands.RainbowCommand;
 import com.jsmn.plugin.commands.RunScriptCommand;
+import com.jsmn.plugin.commands.SaveScriptCommand;
 import com.jsmn.plugin.commands.SphereCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -45,6 +46,7 @@ public class Main extends JavaPlugin {
         CastleCommand castleCmd = new CastleCommand();
         getCommand("castle").setExecutor(castleCmd);
         getCommand("castle").setTabCompleter(castleCmd);
+        getCommand("savescript").setExecutor(new SaveScriptCommand(scriptManager));
 
         getLogger().info("jsmn enabled.");
     }

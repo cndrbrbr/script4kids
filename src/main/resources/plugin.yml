@@ -53,6 +53,11 @@ commands:
     usage: /<command> <material> [side] [height]
     permission: jsmn.runscript
     permission-message: You do not have permission to use this command.
+  savescript:
+    description: Save a JavaScript file to your personal scripts folder. Everything after the name is saved as the script content.
+    usage: /<command> <name> <content...>
+    permission: jsmn.runscript
+    permission-message: You do not have permission to save scripts.
 
 permissions:
   jsmn.runscript:

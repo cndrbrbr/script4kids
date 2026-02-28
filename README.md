@@ -69,10 +69,15 @@ cp target/jsmn-1.0-SNAPSHOT.jar /path/to/spigot/plugins/
 
 ## Commands
 
+Each player has a personal scripts folder at `plugins/jsmn/scripts/<PlayerName>/`.
+`/runscript` checks the player's own folder first, then the shared folder.
+Use `/runscript Steve/castle` to run another player's script.
+
 | Command | Description |
 |---|---|
-| `/listscripts` | List all available scripts |
-| `/runscript <file>` | Run a script |
+| `/savescript <name> <content>` | Save a script to your personal folder |
+| `/listscripts` | List your personal scripts and shared scripts |
+| `/runscript <file>` | Run a script (own folder first, then shared) |
 | `/box <material> [w] [h] [d]` | Place a solid box |
 | `/box0 <material> [w] [h] [d]` | Place a hollow box |
 | `/sphere <material> [radius]` | Build a solid sphere |
