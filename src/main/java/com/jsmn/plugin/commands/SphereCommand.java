@@ -36,14 +36,20 @@ public class SphereCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (!checkHeight(player)) return true;
+
         String material = args[0];
         int radius = args.length > 1 ? parseIntOrDefault(args[1], 10) : 10;
 
-        DroneAPI drone = new DroneAPI(player);
-        if (hollow) {
-            drone.sphere0(material, radius);
-        } else {
-            drone.sphere(material, radius);
+        try {
+            DroneAPI drone = new DroneAPI(player);
+            if (hollow) {
+                drone.sphere0(material, radius);
+            } else {
+                drone.sphere(material, radius);
+            }
+        } catch (Exception e) {
+            sender.sendMessage("§cError: " + e.getMessage());
         }
         return true;
     }
@@ -57,6 +63,17 @@ public class SphereCommand implements CommandExecutor, TabCompleter {
                     .toList();
         }
         return List.of();
+    }
+
+    private boolean checkHeight(Player player) {
+        int y = player.getLocation().getBlockY();
+        int min = player.getWorld().getMinHeight();
+        int max = player.getWorld().getMaxHeight() - 1;
+        if (y < min || y > max) {
+            player.sendMessage("§cYou are outside the build area (Y=" + y + "). Move between Y=" + min + " and Y=" + max + ".");
+            return false;
+        }
+        return true;
     }
 
     private int parseIntOrDefault(String s, int def) {

@@ -36,16 +36,33 @@ public class BoxCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (!checkHeight(player)) return true;
+
         String material = args[0];
         int width  = args.length > 1 ? parseIntOrDefault(args[1], 1) : 1;
         int height = args.length > 2 ? parseIntOrDefault(args[2], 1) : 1;
         int depth  = args.length > 3 ? parseIntOrDefault(args[3], 1) : 1;
 
-        DroneAPI drone = new DroneAPI(player);
-        if (hollow) {
-            drone.box0(material, width, height, depth);
-        } else {
-            drone.box(material, width, height, depth);
+        try {
+            DroneAPI drone = new DroneAPI(player);
+            if (hollow) {
+                drone.box0(material, width, height, depth);
+            } else {
+                drone.box(material, width, height, depth);
+            }
+        } catch (Exception e) {
+            sender.sendMessage("§cError: " + e.getMessage());
+        }
+        return true;
+    }
+
+    private boolean checkHeight(Player player) {
+        int y = player.getLocation().getBlockY();
+        int min = player.getWorld().getMinHeight();
+        int max = player.getWorld().getMaxHeight() - 1;
+        if (y < min || y > max) {
+            player.sendMessage("§cYou are outside the build area (Y=" + y + "). Move between Y=" + min + " and Y=" + max + ".");
+            return false;
         }
         return true;
     }

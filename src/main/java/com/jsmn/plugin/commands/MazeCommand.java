@@ -30,12 +30,18 @@ public class MazeCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (!checkHeight(player)) return true;
+
         String material = args[0];
         int cols   = parseIntOrDefault(args[1], 5);
         int rows   = parseIntOrDefault(args[2], 5);
         int height = args.length > 3 ? parseIntOrDefault(args[3], 3) : 3;
 
-        new DroneAPI(player).maze(material, cols, rows, height);
+        try {
+            new DroneAPI(player).maze(material, cols, rows, height);
+        } catch (Exception e) {
+            sender.sendMessage("§cError: " + e.getMessage());
+        }
         return true;
     }
 
@@ -48,6 +54,17 @@ public class MazeCommand implements CommandExecutor, TabCompleter {
                     .toList();
         }
         return List.of();
+    }
+
+    private boolean checkHeight(Player player) {
+        int y = player.getLocation().getBlockY();
+        int min = player.getWorld().getMinHeight();
+        int max = player.getWorld().getMaxHeight() - 1;
+        if (y < min || y > max) {
+            player.sendMessage("§cYou are outside the build area (Y=" + y + "). Move between Y=" + min + " and Y=" + max + ".");
+            return false;
+        }
+        return true;
     }
 
     private int parseIntOrDefault(String s, int def) {

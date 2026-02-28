@@ -18,8 +18,20 @@ public class RainbowCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        int y = player.getLocation().getBlockY();
+        int min = player.getWorld().getMinHeight();
+        int max = player.getWorld().getMaxHeight() - 1;
+        if (y < min || y > max) {
+            player.sendMessage("§cYou are outside the build area (Y=" + y + "). Move between Y=" + min + " and Y=" + max + ".");
+            return true;
+        }
+
         int radius = args.length > 0 ? parseIntOrDefault(args[0], 18) : 18;
-        new DroneAPI(player).rainbow(radius);
+        try {
+            new DroneAPI(player).rainbow(radius);
+        } catch (Exception e) {
+            sender.sendMessage("§cError: " + e.getMessage());
+        }
         return true;
     }
 

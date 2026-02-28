@@ -30,11 +30,17 @@ public class CastleCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (!checkHeight(player)) return true;
+
         String material = args[0];
         int side   = args.length > 1 ? parseIntOrDefault(args[1], 12) : 12;
         int height = args.length > 2 ? parseIntOrDefault(args[2], 10) : 10;
 
-        new DroneAPI(player).castle(material, side, height);
+        try {
+            new DroneAPI(player).castle(material, side, height);
+        } catch (Exception e) {
+            sender.sendMessage("§cError: " + e.getMessage());
+        }
         return true;
     }
 
@@ -47,6 +53,17 @@ public class CastleCommand implements CommandExecutor, TabCompleter {
                     .toList();
         }
         return List.of();
+    }
+
+    private boolean checkHeight(Player player) {
+        int y = player.getLocation().getBlockY();
+        int min = player.getWorld().getMinHeight();
+        int max = player.getWorld().getMaxHeight() - 1;
+        if (y < min || y > max) {
+            player.sendMessage("§cYou are outside the build area (Y=" + y + "). Move between Y=" + min + " and Y=" + max + ".");
+            return false;
+        }
+        return true;
     }
 
     private int parseIntOrDefault(String s, int def) {
