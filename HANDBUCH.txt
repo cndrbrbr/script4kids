@@ -131,7 +131,11 @@ These commands can be typed directly into the Minecraft chat.
 
   /listscripts                        (alias: /ls)
 
-      Lists your personal scripts and all shared scripts.
+      Lists all scripts on the server, grouped by owner:
+        - Your personal scripts
+        - Each other player's scripts (shown as PlayerName/scriptname
+          so you can copy the name directly into /runscript)
+        - Shared scripts in the common folder
 
       Example:
           /listscripts

@@ -19,7 +19,7 @@ public class ListScriptsCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player p) {
-            // Show the player's own scripts
+            // Player's own scripts
             List<String> personal = scriptManager.listScripts(p.getName());
             if (personal.isEmpty()) {
                 sender.sendMessage("§eYou have no scripts yet. Use /savescript to create one.");
@@ -27,7 +27,17 @@ public class ListScriptsCommand implements CommandExecutor {
                 sender.sendMessage("§aYour scripts:");
                 personal.forEach(s -> sender.sendMessage("§7 - " + s));
             }
-            // Also show shared scripts if any
+            // Other players' scripts
+            scriptManager.listPlayerFolders().stream()
+                    .filter(folder -> !folder.equals(p.getName()))
+                    .forEach(folder -> {
+                        List<String> scripts = scriptManager.listScripts(folder);
+                        if (!scripts.isEmpty()) {
+                            sender.sendMessage("§a" + folder + ":");
+                            scripts.forEach(s -> sender.sendMessage("§7 - " + folder + "/" + s));
+                        }
+                    });
+            // Shared scripts
             List<String> shared = scriptManager.listScripts();
             if (!shared.isEmpty()) {
                 sender.sendMessage("§aShared scripts:");
