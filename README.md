@@ -34,15 +34,29 @@ Thank you, Walter.
 - **JavaScript** — pupil-authored scripts
 - **Maven** — build system
 
-## Build & Deploy
+## Installation
+
+JSMN is a standard Spigot plugin. **No modifications to Spigot are needed.**
+
+1. Copy `jsmn-1.0-SNAPSHOT.jar` into the server's `plugins/` folder.
+2. Start the server with two extra JVM flags:
 
 ```bash
-mvn package -DskipTests
-cp target/jsmn-1.0-SNAPSHOT.jar /path/to/spigot/plugins/
+java -Xmx2G -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI -jar spigot.jar nogui
 ```
 
-Requires GraalVM JDK for full performance. With standard OpenJDK the plugin
-works correctly but runs in interpreter mode.
+These flags are passed to Java, not to Spigot. They unlock GraalVM's JIT compiler so scripts run at full speed. Without them the plugin still works but runs in slower interpreter mode.
+
+3. Put `.js` script files into `plugins/jsmn/scripts/`.
+
+> **Note:** Do not use `/reload` or `/reload confirm`. GraalVM's native library cannot be reloaded in the same JVM process. Always do a full server restart after updating the plugin JAR.
+
+## Build
+
+```bash
+mvn clean package -DskipTests
+cp target/jsmn-1.0-SNAPSHOT.jar /path/to/spigot/plugins/
+```
 
 ## Commands
 
