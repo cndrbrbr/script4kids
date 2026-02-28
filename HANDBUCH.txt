@@ -6,6 +6,24 @@ JSMN lets you write JavaScript files and run them directly inside Minecraft.
 Scripts can send you messages, place blocks, build structures, and generate
 mazes, castles, rainbows, and more — all from code you write yourself.
 
+--------------------------------------------------------------------------------
+  ACKNOWLEDGEMENT
+--------------------------------------------------------------------------------
+
+JSMN is inspired by ScriptCraft, the pioneering plugin by Walter Higgins that
+made it possible to teach children programming through Minecraft. Walter showed
+that Minecraft is not just a game — it is one of the best tools ever made for
+getting kids excited about writing code.
+
+JSMN exists to keep that tradition alive. A custom GUI with an integrated code
+editor was built for the pupils so they can write and run their scripts without
+leaving their workspace. This server-side plugin was created alongside it to
+handle script execution and maintenance on the server.
+
+Thank you, Walter.
+
+ScriptCraft repository:  https://github.com/walterhiggins/ScriptCraft
+
 ================================================================================
   CONTENTS
 ================================================================================
