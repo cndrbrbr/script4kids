@@ -9,6 +9,7 @@ A custom GUI with an integrated code editor was built for the pupils so they
 can write and run their scripts without leaving their workspace. This plugin was
 created alongside it to handle script execution and maintenance on the server.
 
+![Logo](jsmn.png)
 ---
 
 ## Acknowledgement
