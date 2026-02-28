@@ -10,4 +10,5 @@ com/jsmn/plugin/Main.class
 com/jsmn/plugin/api/DroneAPI.class
 com/jsmn/plugin/api/PlayerAPI.class
 com/jsmn/plugin/ScriptManager.class
+com/jsmn/plugin/commands/MyScriptsCommand.class
 com/jsmn/plugin/commands/MazeCommand.class

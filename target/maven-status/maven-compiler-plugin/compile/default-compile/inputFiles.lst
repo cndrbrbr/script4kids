@@ -7,6 +7,7 @@
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/CastleCommand.java
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/ListScriptsCommand.java
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/MazeCommand.java
+/home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/MyScriptsCommand.java
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/RainbowCommand.java
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/RunScriptCommand.java
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/SaveScriptCommand.java

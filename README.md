@@ -76,7 +76,9 @@ Use `/runscript Steve/castle` to run another player's script.
 | Command | Description |
 |---|---|
 | `/savescript <name> <content>` | Save a script to your personal folder |
-| `/listscripts` | List your scripts, all other players' scripts, and shared scripts |
+| `/savescript <name> <content>` | Save a script to your personal folder |
+| `/myscripts` | List only your own personal scripts |
+| `/listscripts` | List all scripts — yours, other players', and shared |
 | `/runscript <file>` | Run a script (own folder first, then shared) |
 | `/box <material> [w] [h] [d]` | Place a solid box |
 | `/box0 <material> [w] [h] [d]` | Place a hollow box |

@@ -66,6 +66,17 @@ restart after updating the plugin JAR.
 
   0. Personal Script Folders
   1. Chat Commands
+       /savescript   Save a script to your personal folder
+       /myscripts    List only your own scripts
+       /listscripts  List all scripts (yours, others, shared)
+       /runscript    Run a script
+       /box          Place a solid box
+       /box0         Place a hollow box
+       /sphere       Build a solid sphere
+       /sphere0      Build a hollow sphere
+       /maze         Generate a random maze
+       /rainbow      Build a rainbow arch
+       /castle       Build a castle
   2. Writing Scripts
   3. The player Object
   4. The drone Object
@@ -126,6 +137,15 @@ These commands can be typed directly into the Minecraft chat.
 
       Tip: For longer scripts, write them in the editor and use the GUI
       to upload them. /savescript is useful for quick one-liners.
+
+--------------------------------------------------------------------------------
+
+  /myscripts                          (alias: /ms)
+
+      Lists only your own scripts in your personal folder.
+
+      Example:
+          /myscripts
 
 --------------------------------------------------------------------------------
 
