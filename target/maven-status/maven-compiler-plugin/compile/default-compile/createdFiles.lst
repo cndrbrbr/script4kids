@@ -1,8 +1,12 @@
-com/jsmn/plugin/commands/ListScriptsCommand.class
-com/jsmn/plugin/api/ConsoleAPI.class
-com/jsmn/plugin/Main.class
-com/jsmn/plugin/api/DroneAPI.class
+com/jsmn/plugin/commands/RainbowCommand.class
 com/jsmn/plugin/commands/RunScriptCommand.class
 com/jsmn/plugin/commands/BoxCommand.class
+com/jsmn/plugin/commands/SphereCommand.class
+com/jsmn/plugin/commands/ListScriptsCommand.class
+com/jsmn/plugin/api/ConsoleAPI.class
+com/jsmn/plugin/commands/CastleCommand.class
+com/jsmn/plugin/Main.class
+com/jsmn/plugin/api/DroneAPI.class
 com/jsmn/plugin/api/PlayerAPI.class
 com/jsmn/plugin/ScriptManager.class
+com/jsmn/plugin/commands/MazeCommand.class

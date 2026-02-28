@@ -4,5 +4,9 @@
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/api/DroneAPI.java
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/api/PlayerAPI.java
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/BoxCommand.java
+/home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/CastleCommand.java
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/ListScriptsCommand.java
+/home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/MazeCommand.java
+/home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/RainbowCommand.java
 /home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/RunScriptCommand.java
+/home/mint/jsmn/src/main/java/com/jsmn/plugin/commands/SphereCommand.java

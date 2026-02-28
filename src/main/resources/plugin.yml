@@ -28,6 +28,31 @@ commands:
     usage: /<command> <material> [width] [height] [depth]
     permission: jsmn.runscript
     permission-message: You do not have permission to use this command.
+  maze:
+    description: Generate a random maze at your position. cols and rows set the number of corridor cells; height sets the wall height in blocks (default 3).
+    usage: /<command> <material> <cols> <rows> [height]
+    permission: jsmn.runscript
+    permission-message: You do not have permission to use this command.
+  sphere:
+    description: Build a solid sphere at your position. Radius defaults to 10, maximum 64.
+    usage: /<command> <material> [radius]
+    permission: jsmn.runscript
+    permission-message: You do not have permission to use this command.
+  sphere0:
+    description: Build a hollow sphere (1 block thick shell) at your position. Radius defaults to 10, maximum 64.
+    usage: /<command> <material> [radius]
+    permission: jsmn.runscript
+    permission-message: You do not have permission to use this command.
+  rainbow:
+    description: Build a rainbow arch in front of you. Radius defaults to 18, minimum 7.
+    usage: /<command> [radius]
+    permission: jsmn.runscript
+    permission-message: You do not have permission to use this command.
+  castle:
+    description: Build a medieval castle with towers, battlements and a gate at your position. Side defaults to 12, height defaults to 10.
+    usage: /<command> <material> [side] [height]
+    permission: jsmn.runscript
+    permission-message: You do not have permission to use this command.
 
 permissions:
   jsmn.runscript:

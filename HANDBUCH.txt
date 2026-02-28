@@ -3,177 +3,461 @@
 ================================================================================
 
 JSMN lets you write JavaScript files and run them directly inside Minecraft.
-Scripts can talk to the player, place blocks, build structures, and generate
-mazes, castles, rainbows, and more.
+Scripts can send you messages, place blocks, build structures, and generate
+mazes, castles, rainbows, and more — all from code you write yourself.
+
+================================================================================
+  CONTENTS
+================================================================================
+
+  1. Chat Commands
+  2. Writing Scripts
+  3. The player Object
+  4. The drone Object
+       - Placing Blocks
+       - Moving the Drone
+       - Turning the Drone
+       - Saving and Restoring Positions
+       - Shapes: Sphere
+       - Maze
+       - Rainbow
+       - Castle
+  5. Shorthand Functions
+  6. Material Names
+  7. Example Scripts
+
+
+================================================================================
+  1. CHAT COMMANDS
+================================================================================
+
+These commands can be typed directly into the Minecraft chat.
 
 --------------------------------------------------------------------------------
-  COMMANDS
+
+  /listscripts                        (alias: /ls)
+
+      Lists all available .js script files.
+
+      Example:
+          /listscripts
+
 --------------------------------------------------------------------------------
 
-  /listscripts          (alias: /ls)
-      Lists all available .js files in the scripts folder.
+  /runscript <filename>               (alias: /rs)
 
-  /runscript <filename> (alias: /rs)
-      Runs a script from the scripts folder.
-      The .js extension is optional.
+      Runs a script file. The .js extension is optional.
 
       Examples:
           /runscript hello
           /runscript hello.js
           /rs build_house
 
+      Scripts are stored in:  plugins/jsmn/scripts/
+
+--------------------------------------------------------------------------------
+
   /box <material> [width] [height] [depth]
-      Places a solid box of blocks at your current position, facing the
-      direction you are looking. All size arguments are optional and default
-      to 1.
+
+      Places a solid box of blocks at your position, in the direction you face.
+      Width goes left/right, height goes up/down, depth goes forward.
+      All size arguments default to 1.
 
       Examples:
-          /box STONE_BRICKS
-          /box OAK_PLANKS 5 3 5
+          /box STONE_BRICKS             -- single stone brick block
+          /box OAK_PLANKS 5 3 5         -- 5 wide, 3 tall, 5 deep plank box
+          /box GOLD_BLOCK 1 10 1        -- a tall gold pillar
+
+--------------------------------------------------------------------------------
 
   /box0 <material> [width] [height] [depth]
-      Places a hollow box (four walls, no floor or ceiling) at your current
-      position. Arguments work the same as /box.
+
+      Places a hollow box (four walls, no floor or ceiling).
+      Arguments work the same as /box.
 
       Examples:
-          /box0 STONE_BRICKS 4 4 4
-          /box0 GLASS 6 3 6
-
-Scripts are stored in:  plugins/jsmn/scripts/
-
+          /box0 STONE_BRICKS 5 4 5      -- a small stone room
+          /box0 GLASS 7 4 7             -- a glass-walled room
+          /box0 OAK_PLANKS 3 3 3        -- tiny wooden hollow cube
 
 --------------------------------------------------------------------------------
-  THE PLAYER OBJECT
+
+  /maze <material> <cols> <rows> [height]
+
+      Generates a random maze at your position.
+      cols   = corridor cells wide   (each cell is 2 blocks wide)
+      rows   = corridor cells deep   (each cell is 2 blocks deep)
+      height = wall height in blocks (default: 3)
+      Every maze is different — it is randomly generated each time.
+
+      Examples:
+          /maze COBBLESTONE 8 8         -- 8×8 cobblestone maze, 3 blocks tall
+          /maze STONE_BRICKS 10 10 4    -- larger maze with 4-block walls
+          /maze OAK_PLANKS 5 5 2        -- small low maze
+
 --------------------------------------------------------------------------------
 
-Every script has access to a 'player' object that represents the person who
-ran the command.
+  /sphere <material> [radius]
 
-  player.getName()          Returns the player's username as a string.
-  player.sendMessage(text)  Sends a message to the player in chat.
-  player.getX()             Returns the player's X coordinate.
-  player.getY()             Returns the player's Y coordinate.
-  player.getZ()             Returns the player's Z coordinate.
-  player.getHealth()        Returns the player's current health points.
+      Builds a solid sphere at your position.
+      Radius defaults to 10. Maximum radius: 64.
 
-Example:
+      Examples:
+          /sphere GLASS                 -- glass sphere, radius 10
+          /sphere SANDSTONE 15          -- large sandstone sphere
+          /sphere DIAMOND_BLOCK 5       -- small diamond sphere
+
+--------------------------------------------------------------------------------
+
+  /sphere0 <material> [radius]
+
+      Builds a hollow sphere (shell, 1 block thick).
+      Radius defaults to 10. Maximum radius: 64.
+
+      Examples:
+          /sphere0 GLASS 12             -- hollow glass dome
+          /sphere0 OAK_PLANKS 8         -- wooden hollow ball
+          /sphere0 OBSIDIAN 6           -- dark hollow sphere
+
+--------------------------------------------------------------------------------
+
+  /rainbow [radius]
+
+      Builds a rainbow arch in the vertical plane in front of you.
+      Uses wool in the classic rainbow colors.
+      Radius defaults to 18. Minimum radius: 7.
+
+      Examples:
+          /rainbow                      -- default rainbow (radius 18)
+          /rainbow 10                   -- smaller rainbow
+          /rainbow 30                   -- huge rainbow
+
+--------------------------------------------------------------------------------
+
+  /castle <material> [side] [height]
+
+      Builds a medieval castle with curtain walls, battlements on top,
+      four corner towers and a gate opening in the front wall.
+      side   = inner wall length between the corner towers (default: 12, min: 10)
+      height = curtain wall height in blocks               (default: 10, min: 6)
+      The corner towers are always 4 blocks taller than the curtain walls.
+
+      Examples:
+          /castle STONE_BRICKS          -- classic stone castle
+          /castle SANDSTONE 16 12       -- large sandstone castle
+          /castle OAK_PLANKS 10 6       -- small wooden fort
+
+--------------------------------------------------------------------------------
+
+Note: movement and turning (fwd, back, left, right, up, down, turn) are not
+available as chat commands. Each chat command places a fresh drone at your
+current position, so moving between commands would have no effect. Use a
+script with /runscript to combine movement and building.
+
+
+================================================================================
+  2. WRITING SCRIPTS
+================================================================================
+
+Scripts are plain text files with a .js extension, saved in:
+
+    plugins/jsmn/scripts/
+
+You can create and edit them with any text editor (Notepad, VS Code, etc.).
+Use /listscripts to see all available scripts and /runscript to run one.
+
+-- Your first script --
+
+Create a file called hello.js with this content:
+
     player.sendMessage("Hello, " + player.getName() + "!");
-    player.sendMessage("You are at " + player.getX() + ", " + player.getY());
+
+Save it, then run it in Minecraft:
+
+    /runscript hello
+
+The server will print your name in the chat.
+
+-- Comments --
+
+Lines starting with // are comments. They are ignored by the script engine
+and are useful for explaining what the code does.
+
+    // This is a comment
+    player.sendMessage("This line runs."); // This comment is ignored
+
+-- Variables --
+
+Use var to store a value and reuse it:
+
+    var name = player.getName();
+    player.sendMessage("Your name is: " + name);
+
+-- Loops --
+
+Use a for loop to repeat something:
+
+    for (var i = 1; i <= 5; i++) {
+        player.sendMessage("Line " + i);
+    }
+
+This sends five messages: "Line 1", "Line 2", ... "Line 5".
+
+-- Functions --
+
+You can define your own functions:
+
+    function greet(name) {
+        player.sendMessage("Hello, " + name + "!");
+    }
+
+    greet("Steve");
+    greet("Alex");
+
+
+================================================================================
+  3. THE player OBJECT
+================================================================================
+
+Every script automatically has a 'player' variable. It represents the player
+who ran the script and lets you read information about them or send them
+messages.
+
+  player.getName()          Returns the player's username as a text string.
+  player.sendMessage(text)  Sends a message to the player in the chat.
+  player.getX()             Returns the player's X coordinate (number).
+  player.getY()             Returns the player's Y coordinate (height).
+  player.getZ()             Returns the player's Z coordinate (number).
+  player.getHealth()        Returns the player's current health (0–20).
+
+-- Examples --
+
+    // Say hello
+    player.sendMessage("Hello, " + player.getName() + "!");
+
+    // Show coordinates
+    var x = player.getX();
+    var y = player.getY();
+    var z = player.getZ();
+    player.sendMessage("You are at X=" + x + " Y=" + y + " Z=" + z);
+
+    // Check health
+    var hp = player.getHealth();
+    if (hp < 10) {
+        player.sendMessage("Warning: your health is low! (" + hp + "/20)");
+    } else {
+        player.sendMessage("You are healthy. HP: " + hp + "/20");
+    }
+
+
+================================================================================
+  4. THE drone OBJECT
+================================================================================
+
+The drone is a virtual builder. When a script starts it appears at the
+player's position, facing the same direction as the player. You give the
+drone instructions to move around and place blocks.
+
+All drone methods return the drone itself, so you can chain calls together:
+
+    drone.box("STONE", 3, 1, 3).up(1).box("GLASS", 3, 1, 3);
 
 
 --------------------------------------------------------------------------------
-  THE DRONE OBJECT
+  PLACING BLOCKS
 --------------------------------------------------------------------------------
-
-The drone is a virtual builder. It starts at the player's position, facing
-the same direction as the player. You move the drone around and it places
-blocks wherever you tell it to. All movement and building commands can be
-chained together.
-
--- Placing blocks --
 
   drone.box(material)
   drone.box(material, width, height, depth)
-      Places a solid box of blocks starting at the drone's position.
-      width = left/right, height = up/down, depth = forward
+
+      Places a solid box. Width goes left/right relative to the drone's
+      facing direction, height goes up, depth goes forward.
+      Calling box with just a material places a single block.
+
+      Examples:
+          drone.box("STONE");                  // one stone block
+          drone.box("OAK_PLANKS", 4, 3, 4);   // 4×3×4 plank box
 
   drone.box0(material, width, height, depth)
-      Places a hollow box (walls only, no floor or ceiling).
 
-  Example:
-      drone.box("OAK_PLANKS", 5, 3, 5);    // solid 5×3×5 box
-      drone.box0("STONE_BRICKS", 4, 4, 4); // hollow stone room
+      Places a hollow box (four walls, no floor or ceiling).
 
--- Moving the drone --
+      Examples:
+          drone.box0("STONE_BRICKS", 5, 4, 5); // stone room, open top+bottom
+          drone.box0("GLASS", 6, 3, 6);         // glass walls
 
-  drone.fwd()     / drone.fwd(n)    Move forward n blocks (default 1).
-  drone.back()    / drone.back(n)   Move backward n blocks.
-  drone.right()   / drone.right(n)  Move right n blocks.
-  drone.left()    / drone.left(n)   Move left n blocks.
-  drone.up()      / drone.up(n)     Move up n blocks.
-  drone.down()    / drone.down(n)   Move down n blocks.
 
--- Turning the drone --
+--------------------------------------------------------------------------------
+  MOVING THE DRONE
+--------------------------------------------------------------------------------
 
-  drone.turn()    / drone.turn(n)   Turn clockwise by n × 90 degrees (default 1).
+All movement commands accept an optional number n. Without it, the drone
+moves 1 block.
+
+  drone.fwd()   / drone.fwd(n)     Move forward n blocks.
+  drone.back()  / drone.back(n)    Move backward n blocks.
+  drone.right() / drone.right(n)   Move right n blocks.
+  drone.left()  / drone.left(n)    Move left n blocks.
+  drone.up()    / drone.up(n)      Move up n blocks.
+  drone.down()  / drone.down(n)    Move down n blocks.
+
+  Examples:
+      drone.fwd(5);                            // move 5 blocks forward
+      drone.up(3).box("GLASS", 1, 1, 1);      // go up 3, place glass block
+      drone.box("STONE", 1, 5, 1).fwd(3)
+           .box("STONE", 1, 5, 1);            // two pillars 3 apart
+
+
+--------------------------------------------------------------------------------
+  TURNING THE DRONE
+--------------------------------------------------------------------------------
+
+  drone.turn()    / drone.turn(n)   Turn n × 90 degrees clockwise (default 1).
   drone.turnRight()                 Turn 90 degrees clockwise.
   drone.turnLeft()                  Turn 90 degrees counter-clockwise.
 
--- Chaining example --
+  The drone starts facing the same direction as the player (north, south,
+  east, or west). After turning, fwd/back/left/right follow the new direction.
 
-  drone.box("OAK_LOG", 1, 5, 1)   // place a pillar
-       .fwd(4)                     // move forward 4 blocks
-       .box("OAK_LOG", 1, 5, 1);  // place another pillar
+  Examples:
+      drone.box("STONE", 1, 3, 1)   // pillar ahead
+           .fwd(4).turn()            // move forward, turn right
+           .box("STONE", 1, 3, 1);  // pillar to the right
 
--- Saving and restoring positions --
+
+--------------------------------------------------------------------------------
+  SAVING AND RESTORING POSITIONS
+--------------------------------------------------------------------------------
 
   drone.chkpt(name)   Save the drone's current position and direction.
-  drone.move(name)    Jump back to a saved position.
+  drone.move(name)    Return to a previously saved position.
+
+  This is useful when building something complex with multiple parts that
+  all start from the same point.
 
   Example:
-      drone.chkpt("start");
-      drone.box("STONE", 3, 3, 3).fwd(5);
-      drone.move("start");         // back to where we began
+      drone.chkpt("origin");
 
--- Sphere --
+      // Build a tower
+      drone.box("STONE_BRICKS", 3, 10, 3);
+
+      // Go back to start and build something else next to it
+      drone.move("origin").right(5);
+      drone.box("OAK_PLANKS", 3, 6, 3);
+
+
+--------------------------------------------------------------------------------
+  SHAPES: SPHERE
+--------------------------------------------------------------------------------
 
   drone.sphere(material)
   drone.sphere(material, radius)
-      Builds a solid sphere. Maximum radius: 64. Default radius: 10.
+
+      Builds a solid sphere centred above the drone's position.
+      The bottom of the sphere sits at the drone's Y level.
+      Default radius: 10. Maximum radius: 64.
 
   drone.sphere0(material)
   drone.sphere0(material, radius)
-      Builds a hollow sphere (1 block thick shell).
 
-  Example:
-      drone.sphere("GLASS", 8);
-      drone.sphere0("SANDSTONE", 12);
+      Builds a hollow sphere (shell, 1 block thick).
+      Default radius: 10. Maximum radius: 64.
 
--- Maze --
+  Examples:
+      drone.sphere("GLASS", 8);         // solid glass sphere, radius 8
+      drone.sphere0("SANDSTONE", 12);   // hollow sandstone shell, radius 12
+
+      // Build a snow globe: hollow glass ball with a tree inside
+      drone.chkpt("base");
+      drone.sphere0("GLASS", 8);
+      drone.move("base").up(1).fwd(1);
+      drone.box("OAK_LOG", 1, 5, 1);   // trunk
+      drone.up(5).sphere("OAK_LEAVES", 3); // leaves
+
+
+--------------------------------------------------------------------------------
+  MAZE
+--------------------------------------------------------------------------------
 
   drone.maze(material, cols, rows)
   drone.maze(material, cols, rows, height)
-      Generates a random maze using recursive backtracking.
-      cols  = number of corridor cells wide
-      rows  = number of corridor cells deep
-      height = wall height in blocks (default 3)
 
-  Example:
-      drone.maze("COBBLESTONE", 10, 10);
-      drone.maze("BRICK", 8, 6, 4);
+      Generates a random solvable maze using recursive backtracking.
+      Each call produces a different maze layout.
 
--- Rainbow --
+      cols   = corridor cells wide  (the actual block width is 2*cols + 1)
+      rows   = corridor cells deep  (the actual block depth is 2*rows + 1)
+      height = wall height (default: 3)
+
+      An entrance is carved at the front-left and an exit at the back-right.
+
+  Examples:
+      drone.maze("COBBLESTONE", 8, 8);       // standard maze
+      drone.maze("STONE_BRICKS", 12, 12, 4); // large, tall-walled maze
+      drone.maze("OAK_PLANKS", 5, 5, 2);     // small low maze
+
+      // Different material on each run
+      var mats = ["STONE", "COBBLESTONE", "STONE_BRICKS"];
+      drone.maze(mats[Math.floor(Math.random() * mats.length)], 8, 8);
+
+
+--------------------------------------------------------------------------------
+  RAINBOW
+--------------------------------------------------------------------------------
 
   drone.rainbow()
   drone.rainbow(radius)
-      Builds a rainbow arch in the vertical plane in front of the drone.
+
+      Builds a rainbow arch in the vertical plane directly in front of the
+      drone. Uses seven wool colors: red, orange, yellow, lime, cyan, blue,
+      purple. Each color band is 2 blocks wide.
+
       Default radius: 18. Minimum radius: 7.
 
-  Example:
-      drone.rainbow();
-      drone.rainbow(12);
+  Examples:
+      drone.rainbow();          // default size
+      drone.rainbow(10);        // compact rainbow
+      drone.rainbow(30);        // enormous rainbow
 
--- Castle --
+      // Two rainbows side by side
+      drone.chkpt("start");
+      drone.rainbow(15);
+      drone.move("start").right(35);
+      drone.rainbow(15);
+
+
+--------------------------------------------------------------------------------
+  CASTLE
+--------------------------------------------------------------------------------
 
   drone.castle(material)
   drone.castle(material, side, height)
-      Builds a medieval castle with curtain walls, battlements, four corner
-      towers, and a gate.
-      side   = inner wall length between towers (default 12, minimum 10)
-      height = curtain wall height (default 10, minimum 6)
-      Towers are always 4 blocks taller than the curtain walls.
 
-  Example:
-      drone.castle("STONE_BRICKS");
-      drone.castle("SANDSTONE", 16, 12);
+      Builds a complete medieval castle:
+        - Four curtain walls forming a square
+        - Battlements (merlons) on top of the curtain walls
+        - Four corner towers, each 4 blocks taller than the curtain walls
+        - Battlements on top of each tower
+        - A 2-wide × 3-tall gate opening in the centre of the front wall
+
+      side   = inner wall length between towers (default: 12, minimum: 10)
+      height = curtain wall height              (default: 10, minimum: 6)
+
+  Examples:
+      drone.castle("STONE_BRICKS");             // standard stone castle
+      drone.castle("SANDSTONE", 16, 12);        // grand desert fortress
+      drone.castle("OAK_PLANKS", 10, 6);        // small wooden fort
+
+      // Castle on a hill: place it 10 blocks forward and 5 blocks up
+      drone.fwd(10).up(5).castle("STONE_BRICKS", 14, 10);
 
 
---------------------------------------------------------------------------------
-  SHORTHAND FUNCTIONS
---------------------------------------------------------------------------------
+================================================================================
+  5. SHORTHAND FUNCTIONS
+================================================================================
 
-The most common drone commands are also available as direct functions so you
-do not need to type "drone." every time:
+Inside scripts, the most common drone commands are available as plain
+functions so you do not have to type "drone." every time.
 
   box(material, width, height, depth)
   box0(material, width, height, depth)
@@ -184,54 +468,215 @@ do not need to type "drone." every time:
   rainbow(radius)
   turn(n)
 
-  Example:
-      box("DIRT", 3, 1, 3);
-      castle("OAK_PLANKS");
+These are exactly equivalent to calling the same method on drone.
+Note: chaining (using a dot to continue) does not work with these shorthands.
+Use drone.method() if you want to chain calls.
+
+  Examples:
+      box("DIRT", 5, 1, 5);         // flat dirt platform
+      castle("STONE_BRICKS");        // stone castle
+      rainbow();                     // rainbow behind you
+
+      // Using a loop with shorthands
+      for (var i = 0; i < 4; i++) {
+          box("OAK_LOG", 1, 4, 1);
+          drone.fwd(3);              // move still needs drone.
+          turn();                    // turn 90 degrees
+      }
 
 
---------------------------------------------------------------------------------
-  MATERIAL NAMES
---------------------------------------------------------------------------------
+================================================================================
+  6. MATERIAL NAMES
+================================================================================
 
-Materials use Minecraft's internal block names in UPPER_CASE. Some examples:
+Material names use Minecraft's internal UPPER_CASE names. A selection:
 
-  STONE            COBBLESTONE      STONE_BRICKS     SMOOTH_STONE
-  OAK_PLANKS       SPRUCE_PLANKS    DARK_OAK_PLANKS  BAMBOO_PLANKS
-  OAK_LOG          SPRUCE_LOG       BIRCH_LOG
-  SAND             SANDSTONE        RED_SANDSTONE
-  DIRT             GRASS_BLOCK      GRAVEL
-  GLASS            TINTED_GLASS
-  BRICKS           MOSSY_COBBLESTONE
-  GOLD_BLOCK       IRON_BLOCK       DIAMOND_BLOCK    EMERALD_BLOCK
-  OBSIDIAN         BEDROCK          NETHERRACK
-  SNOW_BLOCK       ICE              BLUE_ICE
-  WHITE_WOOL       ORANGE_WOOL      YELLOW_WOOL      LIME_WOOL
-  CYAN_WOOL        BLUE_WOOL        PURPLE_WOOL      RED_WOOL
-  WHITE_CONCRETE   GRAY_CONCRETE    BLACK_CONCRETE
+-- Stone & Brick --
+  STONE              SMOOTH_STONE       COBBLESTONE        MOSSY_COBBLESTONE
+  STONE_BRICKS       MOSSY_STONE_BRICKS CRACKED_STONE_BRICKS CHISELED_STONE_BRICKS
+  BRICKS             DEEPSLATE          DEEPSLATE_BRICKS   DEEPSLATE_TILES
+
+-- Wood --
+  OAK_PLANKS         SPRUCE_PLANKS      BIRCH_PLANKS       JUNGLE_PLANKS
+  ACACIA_PLANKS      DARK_OAK_PLANKS    BAMBOO_PLANKS      CHERRY_PLANKS
+  OAK_LOG            SPRUCE_LOG         BIRCH_LOG          JUNGLE_LOG
+  OAK_LEAVES         SPRUCE_LEAVES      BIRCH_LEAVES
+
+-- Sand & Earth --
+  DIRT               GRASS_BLOCK        GRAVEL             SAND
+  SANDSTONE          RED_SANDSTONE      SMOOTH_SANDSTONE   SOUL_SAND
+
+-- Glass --
+  GLASS              TINTED_GLASS
+  WHITE_STAINED_GLASS  ORANGE_STAINED_GLASS  YELLOW_STAINED_GLASS
+  LIME_STAINED_GLASS   CYAN_STAINED_GLASS    BLUE_STAINED_GLASS
+
+-- Ore Blocks --
+  GOLD_BLOCK         IRON_BLOCK         DIAMOND_BLOCK      EMERALD_BLOCK
+  NETHERITE_BLOCK    LAPIS_BLOCK        REDSTONE_BLOCK     COAL_BLOCK
+
+-- Wool --
+  WHITE_WOOL         ORANGE_WOOL        MAGENTA_WOOL       LIGHT_BLUE_WOOL
+  YELLOW_WOOL        LIME_WOOL          PINK_WOOL          GRAY_WOOL
+  CYAN_WOOL          PURPLE_WOOL        BLUE_WOOL          RED_WOOL
+  BLACK_WOOL         BROWN_WOOL
+
+-- Concrete --
+  WHITE_CONCRETE     ORANGE_CONCRETE    YELLOW_CONCRETE    LIME_CONCRETE
+  CYAN_CONCRETE      BLUE_CONCRETE      PURPLE_CONCRETE    RED_CONCRETE
+  BLACK_CONCRETE     GRAY_CONCRETE
+
+-- Other --
+  OBSIDIAN           BEDROCK            NETHERRACK         END_STONE
+  SNOW_BLOCK         ICE                PACKED_ICE         BLUE_ICE
+  GLOWSTONE          SEA_LANTERN        SHROOMLIGHT
+  TNT                SPONGE
 
 If an unknown material name is used, the block defaults to OAK_PLANKS.
 
 
---------------------------------------------------------------------------------
-  EXAMPLE SCRIPTS
+================================================================================
+  7. EXAMPLE SCRIPTS
+================================================================================
+
+Copy these into the scripts folder and run them with /runscript.
+
 --------------------------------------------------------------------------------
 
 -- hello.js --
+
+    // Greet the player by name
     player.sendMessage("Hello, " + player.getName() + "!");
+    player.sendMessage("You are at X=" + player.getX() + " Y=" + player.getY() + " Z=" + player.getZ());
+
+--------------------------------------------------------------------------------
+
+-- platform.js --
+
+    // Build a 9×9 stone platform one block below the player
+    drone.down(1).box("STONE", 9, 1, 9);
+    player.sendMessage("Platform built!");
+
+--------------------------------------------------------------------------------
 
 -- tower.js --
-    // Build a 3×10×3 stone tower with a glass top
-    drone.box("STONE_BRICKS", 3, 10, 3)
-         .up(10)
-         .box("GLASS", 3, 2, 3);
 
--- row_of_pillars.js --
-    for (var i = 0; i < 5; i++) {
-        drone.box("OAK_LOG", 1, 5, 1).fwd(3);
+    // Build a 3×15 stone tower with a glass observation room on top
+    drone.box("STONE_BRICKS", 3, 15, 3)   // shaft
+         .up(15)
+         .box0("GLASS", 3, 3, 3);         // glass room
+    player.sendMessage("Tower complete.");
+
+--------------------------------------------------------------------------------
+
+-- pillars.js --
+
+    // Build a row of 6 oak log pillars, 3 blocks apart
+    for (var i = 0; i < 6; i++) {
+        drone.box("OAK_LOG", 1, 6, 1);
+        drone.fwd(3);
+    }
+    player.sendMessage("Pillars built.");
+
+--------------------------------------------------------------------------------
+
+-- house.js --
+
+    // A simple house: wooden walls with a stone brick roof
+    var w = 7;   // width
+    var d = 9;   // depth
+    var h = 4;   // wall height
+
+    drone.chkpt("house_start");
+
+    // Walls
+    drone.box0("OAK_PLANKS", w, h, d);
+
+    // Roof
+    drone.up(h).box("STONE_BRICKS", w, 1, d);
+
+    // Door opening (2 wide, 2 tall, in the front wall centre)
+    drone.move("house_start");
+    drone.right(2).box("AIR", 2, 2, 1);
+
+    player.sendMessage("House built!");
+
+--------------------------------------------------------------------------------
+
+-- concentric_spheres.js --
+
+    // Build three hollow spheres inside each other
+    drone.chkpt("centre");
+    drone.sphere0("GLASS", 12);
+    drone.move("centre");
+    drone.sphere0("GOLD_BLOCK", 8);
+    drone.move("centre");
+    drone.sphere0("DIAMOND_BLOCK", 4);
+    player.sendMessage("Spheres complete.");
+
+--------------------------------------------------------------------------------
+
+-- maze_challenge.js --
+
+    // Generate a random maze and tell the player where to find it
+    drone.fwd(5);   // start maze 5 blocks ahead so the entrance is reachable
+    drone.maze("STONE_BRICKS", 10, 10, 4);
+    player.sendMessage("Maze generated! Find the exit at the far side.");
+
+--------------------------------------------------------------------------------
+
+-- castle_on_hill.js --
+
+    // Raise a hill of dirt then build a sandstone castle on top
+    drone.chkpt("base");
+
+    // Hill: stacked, shrinking boxes
+    for (var level = 0; level < 6; level++) {
+        var size = 28 - level * 4;
+        drone.box("GRASS_BLOCK", size, 1, size);
+        drone.up(1).right(2).fwd(2);
     }
 
--- big_maze.js --
-    drone.maze("COBBLESTONE", 12, 12, 4);
+    // Castle on top of the hill
+    drone.castle("SANDSTONE", 12, 8);
+
+    player.sendMessage("Castle on a hill complete!");
+
+--------------------------------------------------------------------------------
+
+-- rainbow_valley.js --
+
+    // Build three rainbows of different sizes in a row
+    drone.chkpt("start");
+
+    drone.rainbow(12);
+    drone.move("start").right(28);
+    drone.rainbow(18);
+    drone.move("start").right(64);
+    drone.rainbow(12);
+
+    player.sendMessage("Rainbow valley complete!");
+
+--------------------------------------------------------------------------------
+
+-- checkerboard.js --
+
+    // Build a 10×10 checkerboard floor of two materials
+    var mat1 = "WHITE_CONCRETE";
+    var mat2 = "BLACK_CONCRETE";
+    var size = 10;
+
+    for (var row = 0; row < size; row++) {
+        drone.chkpt("row_start");
+        for (var col = 0; col < size; col++) {
+            var mat = ((row + col) % 2 === 0) ? mat1 : mat2;
+            drone.box(mat, 1, 1, 1);
+            drone.right(1);
+        }
+        drone.move("row_start").fwd(1);
+    }
+
+    player.sendMessage("Checkerboard floor complete!");
 
 
 ================================================================================
