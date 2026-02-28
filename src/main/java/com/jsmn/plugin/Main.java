@@ -6,6 +6,7 @@ import com.jsmn.plugin.commands.ListScriptsCommand;
 import com.jsmn.plugin.commands.MazeCommand;
 import com.jsmn.plugin.commands.RainbowCommand;
 import com.jsmn.plugin.commands.RunScriptCommand;
+import com.jsmn.plugin.commands.MyScriptsCommand;
 import com.jsmn.plugin.commands.SaveScriptCommand;
 import com.jsmn.plugin.commands.SphereCommand;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,6 +26,7 @@ public class Main extends JavaPlugin {
         getCommand("runscript").setExecutor(runScriptCmd);
         getCommand("runscript").setTabCompleter(runScriptCmd);
         getCommand("listscripts").setExecutor(new ListScriptsCommand(scriptManager));
+        getCommand("myscripts").setExecutor(new MyScriptsCommand(scriptManager));
         BoxCommand boxCmd  = new BoxCommand(false);
         BoxCommand box0Cmd = new BoxCommand(true);
         getCommand("box").setExecutor(boxCmd);

@@ -53,6 +53,12 @@ commands:
     usage: /<command> <material> [side] [height]
     permission: jsmn.runscript
     permission-message: You do not have permission to use this command.
+  myscripts:
+    description: List only your own scripts in your personal folder.
+    usage: /<command>
+    aliases: [ms]
+    permission: jsmn.runscript
+    permission-message: You do not have permission to list scripts.
   savescript:
     description: Save a JavaScript file to your personal scripts folder. Everything after the name is saved as the script content.
     usage: /<command> <name> <content...>
