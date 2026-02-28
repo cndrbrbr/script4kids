@@ -32,18 +32,22 @@ JSMN is a standard Spigot plugin. The Spigot server itself is not modified.
 
   1. Copy  jsmn-1.0-SNAPSHOT.jar  into the server's  plugins/  folder.
 
-  2. Start the server with these two extra JVM flags:
+  2. Start the server with the following JVM flags. These are passed to Java,
+     not to Spigot. GraalVM needs them to access JDK internals at runtime.
 
-         -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI
+         java -Xmx2G \
+           -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI \
+           --add-opens=java.base/java.lang=ALL-UNNAMED \
+           --add-opens=java.base/java.lang.invoke=ALL-UNNAMED \
+           --add-opens=java.base/java.lang.ref=ALL-UNNAMED \
+           --add-opens=java.base/java.nio=ALL-UNNAMED \
+           --add-opens=java.base/java.util=ALL-UNNAMED \
+           --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED \
+           -Dpolyglot.engine.WarnInterpreterOnly=false \
+           -jar spigot.jar nogui
 
-     These flags are passed to Java, not to Spigot. They unlock GraalVM's JIT
-     compiler so that scripts run at full speed. Without them the plugin still
-     works, but runs in slower interpreter mode.
-
-     Example start command:
-
-         java -Xmx2G -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI \
-              -jar spigot.jar nogui
+     The plugin runs on standard OpenJDK 21. Scripts execute in GraalVM
+     interpreter mode, which is fast enough for teaching purposes.
 
   3. Put your .js script files into:
 
