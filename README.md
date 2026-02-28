@@ -58,6 +58,23 @@ The plugin runs on standard **OpenJDK 21**. Scripts execute in GraalVM interpret
 
 3. Put `.js` script files into `plugins/jsmn/scripts/`.
 
+### HTTP file upload
+
+The plugin starts a small HTTP server on port `25580` (configurable). GUIs and tools can upload scripts directly without pasting:
+
+```
+POST http://<server>:25580/upload?player=<name>&name=<scriptname>
+Body: script content (plain text)
+```
+
+Example with curl:
+```bash
+curl -X POST "http://localhost:25580/upload?player=Steve&name=myhouse" \
+     --data-binary @myhouse.js
+```
+
+Optionally set `upload-api-key` in `plugins/jsmn/config.yml` to require an `X-Api-Key` header on every request. CORS headers are included so browser-based GUIs can call the endpoint directly.
+
 > **Note:** Do not use `/reload` or `/reload confirm`. GraalVM's native library cannot be reloaded in the same JVM process. Always do a full server restart after updating the plugin JAR.
 
 ## Build

@@ -59,6 +59,29 @@ Note: do not use /reload or /reload confirm — GraalVM's native library cannot
 be unloaded and reloaded in the same JVM process. Always do a full server
 restart after updating the plugin JAR.
 
+-- HTTP File Upload --
+
+Scripts can also be uploaded via HTTP without pasting content into the chat.
+The plugin starts a small HTTP server alongside Spigot (default port 25580).
+
+  Endpoint:   POST http://<server>:25580/upload?player=<name>&name=<scriptname>
+  Body:       The JavaScript source code (plain text)
+  Response:   200 OK on success, error message otherwise
+
+  Example with curl:
+      curl -X POST \
+        "http://localhost:25580/upload?player=Steve&name=myhouse" \
+        --data-binary @myhouse.js
+
+  Optional API key:
+      Set  upload-api-key  in  plugins/jsmn/config.yml  to require an
+      X-Api-Key header on every request:
+          curl -H "X-Api-Key: secret" -X POST ...
+
+  The port and key can be changed in  plugins/jsmn/config.yml:
+      upload-port: 25580
+      upload-api-key: ""
+
 
 ================================================================================
   CONTENTS

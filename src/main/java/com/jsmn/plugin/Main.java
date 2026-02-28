@@ -4,16 +4,19 @@ import com.jsmn.plugin.commands.BoxCommand;
 import com.jsmn.plugin.commands.CastleCommand;
 import com.jsmn.plugin.commands.ListScriptsCommand;
 import com.jsmn.plugin.commands.MazeCommand;
+import com.jsmn.plugin.commands.MyScriptsCommand;
 import com.jsmn.plugin.commands.RainbowCommand;
 import com.jsmn.plugin.commands.RunScriptCommand;
-import com.jsmn.plugin.commands.MyScriptsCommand;
 import com.jsmn.plugin.commands.SaveScriptCommand;
 import com.jsmn.plugin.commands.SphereCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
+
 public class Main extends JavaPlugin {
 
     private ScriptManager scriptManager;
+    private HttpUploadServer uploadServer;
 
     @Override
     public void onEnable() {
@@ -21,6 +24,15 @@ public class Main extends JavaPlugin {
         getDataFolder().mkdirs();
 
         scriptManager = new ScriptManager(this);
+
+        // HTTP upload server
+        int port = getConfig().getInt("upload-port", 25580);
+        String apiKey = getConfig().getString("upload-api-key", "");
+        try {
+            uploadServer = new HttpUploadServer(scriptManager, getLogger(), port, apiKey);
+        } catch (IOException e) {
+            getLogger().severe("Failed to start HTTP upload server on port " + port + ": " + e.getMessage());
+        }
 
         RunScriptCommand runScriptCmd = new RunScriptCommand(scriptManager);
         getCommand("runscript").setExecutor(runScriptCmd);
@@ -55,6 +67,9 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (uploadServer != null) {
+            uploadServer.stop();
+        }
         if (scriptManager != null) {
             scriptManager.shutdown();
         }

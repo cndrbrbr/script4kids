@@ -1,4 +1,5 @@
 com/jsmn/plugin/commands/RainbowCommand.class
+com/jsmn/plugin/HttpUploadServer.class
 com/jsmn/plugin/commands/RunScriptCommand.class
 com/jsmn/plugin/commands/BoxCommand.class
 com/jsmn/plugin/commands/SphereCommand.class
