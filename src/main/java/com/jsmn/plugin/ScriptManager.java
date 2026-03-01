@@ -15,6 +15,7 @@ import org.graalvm.polyglot.Value;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,16 +39,57 @@ public class ScriptManager {
         }
     }
 
-    public void runScript(String filename, CommandSender sender) {
+    /** Returns (and creates) the personal scripts folder for a player. */
+    public File getPlayerScriptsDir(String playerName) {
+        File dir = new File(scriptsDir, playerName);
+        dir.mkdirs();
+        return dir;
+    }
+
+    /** Saves script content to the player's personal folder. */
+    public void saveScript(String name, String content, String playerName) throws IOException {
+        File dir = getPlayerScriptsDir(playerName);
+        File file = new File(dir, name + ".js");
+        Files.writeString(file.toPath(), content);
+    }
+
+    /** Lists scripts in the player's personal folder (names without .js). */
+    public List<String> listScripts(String playerName) {
+        File dir = new File(scriptsDir, playerName);
+        if (!dir.exists()) return List.of();
+        File[] files = dir.listFiles((d, n) -> n.endsWith(".js"));
+        if (files == null) return List.of();
+        return Arrays.stream(files)
+                .map(f -> f.getName().substring(0, f.getName().length() - 3))
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    /** Lists scripts in the shared folder (names without .js). */
+    public List<String> listScripts() {
+        File[] files = scriptsDir.listFiles((dir, name) -> name.endsWith(".js"));
+        if (files == null) return List.of();
+        return Arrays.stream(files)
+                .map(File::getName)
+                .collect(Collectors.toList());
+    }
+
+    /** Returns all player folder names (subdirectories of scriptsDir). */
+    public List<String> listPlayerFolders() {
+        File[] dirs = scriptsDir.listFiles(File::isDirectory);
+        if (dirs == null) return List.of();
+        return Arrays.stream(dirs).map(File::getName).sorted().collect(Collectors.toList());
+    }
+
+    public void runScript(String path, CommandSender sender) {
         if (engine == null) {
             sender.sendMessage("§cScript engine failed to initialise. The server needs a full restart.");
             return;
         }
 
-        File scriptFile = new File(scriptsDir, filename.endsWith(".js") ? filename : filename + ".js");
-
-        if (!scriptFile.exists()) {
-            sender.sendMessage("§cScript not found: " + filename);
+        File scriptFile = resolveScript(path, sender);
+        if (scriptFile == null) {
+            sender.sendMessage("§cScript not found: " + path);
             return;
         }
 
@@ -64,7 +106,6 @@ public class ScriptManager {
             if (sender instanceof Player p) {
                 DroneAPI drone = new DroneAPI(p);
                 bindings.putMember("drone", drone);
-                // top-level box/box0 shorthands, ScriptCraft-style
                 context.eval("js", "function box(mat,w,h,d){ return drone.box(mat,w||1,h||1,d||1); }");
                 context.eval("js", "function box0(mat,w,h,d){ return drone.box0(mat,w||1,h||1,d||1); }");
                 context.eval("js", "function turn(n){ return drone.turn(n===undefined?1:n); }");
@@ -81,19 +122,38 @@ public class ScriptManager {
 
         } catch (PolyglotException e) {
             sender.sendMessage("§cScript error: " + e.getMessage());
-            plugin.getLogger().warning("Script error in " + filename + ": " + e.getMessage());
+            plugin.getLogger().warning("Script error in " + path + ": " + e.getMessage());
         } catch (IOException e) {
             sender.sendMessage("§cFailed to read script.");
-            plugin.getLogger().severe("Could not read script " + filename + ": " + e.getMessage());
+            plugin.getLogger().severe("Could not read script " + path + ": " + e.getMessage());
         }
     }
 
-    public List<String> listScripts() {
-        File[] files = scriptsDir.listFiles((dir, name) -> name.endsWith(".js"));
-        if (files == null) return List.of();
-        return Arrays.stream(files)
-                .map(File::getName)
-                .collect(Collectors.toList());
+    /**
+     * Resolves a script path to a File.
+     *
+     * - "folder/name"  → scripts/folder/name.js  (explicit folder)
+     * - "name"         → scripts/<PlayerName>/name.js  (player's own folder, if player)
+     *                  → scripts/name.js                (shared folder fallback)
+     */
+    private File resolveScript(String path, CommandSender sender) {
+        String normalized = path.endsWith(".js") ? path.substring(0, path.length() - 3) : path;
+
+        if (normalized.contains("/")) {
+            // Explicit folder/name — look directly there
+            File f = new File(scriptsDir, normalized + ".js");
+            return f.exists() ? f : null;
+        }
+
+        // Check player's own folder first
+        if (sender instanceof Player p) {
+            File personal = new File(getPlayerScriptsDir(p.getName()), normalized + ".js");
+            if (personal.exists()) return personal;
+        }
+
+        // Fall back to shared folder
+        File shared = new File(scriptsDir, normalized + ".js");
+        return shared.exists() ? shared : null;
     }
 
     public void shutdown() {

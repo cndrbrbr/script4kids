@@ -1,1 +1,9 @@
 scripts-folder: scripts
+
+# HTTP upload server
+# Players can upload .js files to their personal folder via HTTP POST.
+# Endpoint: POST http://<server>:<upload-port>/upload?player=<name>&name=<scriptname>
+# Body: script content (plain text)
+# Optional: set upload-api-key to require an X-Api-Key header on every request.
+upload-port: 25580
+upload-api-key: ""
