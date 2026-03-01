@@ -68,12 +68,27 @@ http://<server>:25580/
 
 The page has a Minecraft username field, a file picker (click or drag & drop), and an Upload button. The script name is taken from the filename automatically. After uploading, the script is immediately available via `/runscript`.
 
+The server checks that the entered Minecraft username is currently logged in. Uploads from players who are not online are rejected with a `403` error.
+
 If `upload-api-key` is set in `plugins/jsmn/config.yml`, append it to the URL:
 ```
 http://<server>:25580/?key=<secret>
 ```
 
 The HTTP endpoint (`POST /upload`) also accepts programmatic requests, so the custom GUI can upload files directly without using the browser page. CORS headers are included.
+
+### Workshop setup
+
+JSMN is designed for coding workshops and classroom sessions:
+
+1. Start a laptop or server running Spigot with JSMN on a local network.
+2. All participants connect to the same Wi-Fi.
+3. Every participant joins the Minecraft server with their username. **They must be logged in** — the server verifies this before accepting any upload.
+4. Everyone opens `http://<server>:25580/` in their browser.
+5. Each participant writes a script, saves it as a `.js` file, and uploads it with their Minecraft name.
+6. The script appears in their personal folder instantly — run it with `/runscript <name>`.
+
+No shared drives, no USB sticks, no copy-pasting. Each participant works in their own folder and can browse and run each other's scripts with `/listscripts` and `/runscript <player>/<name>`. The login check also prevents accidentally uploading under someone else's name.
 
 > **Note:** Do not use `/reload` or `/reload confirm`. GraalVM's native library cannot be reloaded in the same JVM process. Always do a full server restart after updating the plugin JAR.
 

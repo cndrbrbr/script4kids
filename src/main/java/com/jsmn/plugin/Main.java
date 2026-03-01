@@ -29,7 +29,7 @@ public class Main extends JavaPlugin {
         int port = getConfig().getInt("upload-port", 25580);
         String apiKey = getConfig().getString("upload-api-key", "");
         try {
-            uploadServer = new HttpUploadServer(scriptManager, getLogger(), port, apiKey);
+            uploadServer = new HttpUploadServer(scriptManager, getServer(), getLogger(), port, apiKey);
         } catch (IOException e) {
             getLogger().severe("Failed to start HTTP upload server on port " + port + ": " + e.getMessage());
         }

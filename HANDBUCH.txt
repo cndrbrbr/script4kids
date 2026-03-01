@@ -77,6 +77,33 @@ a small web server alongside Spigot (default port 25580).
   myhouse.js will be saved as  myhouse  in your personal scripts folder and
   can then be run with  /runscript myhouse.
 
+  Important: you must be logged in to the Minecraft server when you upload.
+  The upload page checks that your Minecraft username is currently online.
+  If you are not logged in, the upload will be rejected.
+
+-- Use in Workshops --
+
+  The upload page is well suited for coding workshops and classroom sessions:
+
+    1. The workshop leader starts a laptop or server running Spigot with JSMN.
+    2. All participants connect to the same local Wi-Fi network.
+    3. Every participant joins the Minecraft server with their username.
+       (They must be logged in — the server checks this before accepting
+       any upload.)
+    4. Everyone opens  http://<server>:25580/  in their browser.
+    5. Each participant writes a script on their own computer (in any text
+       editor or the custom GUI), saves it as a .js file, and uploads it
+       through the browser page using their Minecraft name.
+    6. The script lands in their personal folder on the server instantly.
+    7. They switch to Minecraft and run it with  /runscript <name>.
+
+  No shared drives, no USB sticks, no copy-pasting code into chat — each
+  participant works independently in their own folder and can see and run
+  each other's scripts with  /listscripts  and  /runscript <player>/<name>.
+
+  The login check also prevents participants from uploading scripts under
+  someone else's name by accident.
+
   Optional API key:
       If  upload-api-key  is set in  plugins/jsmn/config.yml,  append the
       key to the URL so the page can authenticate:

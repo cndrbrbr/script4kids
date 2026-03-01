@@ -2,6 +2,7 @@ package com.jsmn.plugin;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import org.bukkit.Server;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,12 +21,14 @@ public class HttpUploadServer {
     private static final Pattern VALID_NAME = Pattern.compile("^[a-zA-Z0-9_-]+$");
 
     private final ScriptManager scriptManager;
+    private final Server bukkitServer;
     private final Logger logger;
     private final String apiKey;
     private HttpServer server;
 
-    public HttpUploadServer(ScriptManager scriptManager, Logger logger, int port, String apiKey) throws IOException {
+    public HttpUploadServer(ScriptManager scriptManager, Server bukkitServer, Logger logger, int port, String apiKey) throws IOException {
         this.scriptManager = scriptManager;
+        this.bukkitServer = bukkitServer;
         this.logger = logger;
         this.apiKey = apiKey;
 
@@ -100,6 +103,12 @@ public class HttpUploadServer {
         }
         if (!VALID_NAME.matcher(name).matches()) {
             respond(exchange, 400, "Invalid script name. Use only letters, numbers, underscores and hyphens.");
+            return;
+        }
+
+        // Check the player is currently logged in to the server
+        if (bukkitServer.getPlayerExact(player) == null) {
+            respond(exchange, 403, "Player '" + player + "' is not logged in to the server.");
             return;
         }
 
