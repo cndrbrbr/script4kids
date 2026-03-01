@@ -59,28 +59,35 @@ Note: do not use /reload or /reload confirm — GraalVM's native library cannot
 be unloaded and reloaded in the same JVM process. Always do a full server
 restart after updating the plugin JAR.
 
--- HTTP File Upload --
+-- Script Upload Page --
 
-Scripts can also be uploaded via HTTP without pasting content into the chat.
-The plugin starts a small HTTP server alongside Spigot (default port 25580).
+Scripts can be uploaded from your computer using a browser. The plugin starts
+a small web server alongside Spigot (default port 25580).
 
-  Endpoint:   POST http://<server>:25580/upload?player=<name>&name=<scriptname>
-  Body:       The JavaScript source code (plain text)
-  Response:   200 OK on success, error message otherwise
+  Open this address in any browser:
 
-  Example with curl:
-      curl -X POST \
-        "http://localhost:25580/upload?player=Steve&name=myhouse" \
-        --data-binary @myhouse.js
+      http://<server>:25580/
+
+  The page shows:
+    - A field for your Minecraft username
+    - A file picker — click it or drag and drop a .js file onto it
+    - An Upload button (enabled once both fields are filled)
+
+  The script name is taken from the filename automatically. A file called
+  myhouse.js will be saved as  myhouse  in your personal scripts folder and
+  can then be run with  /runscript myhouse.
 
   Optional API key:
-      Set  upload-api-key  in  plugins/jsmn/config.yml  to require an
-      X-Api-Key header on every request:
-          curl -H "X-Api-Key: secret" -X POST ...
+      If  upload-api-key  is set in  plugins/jsmn/config.yml,  append the
+      key to the URL so the page can authenticate:
+
+          http://<server>:25580/?key=<secret>
 
   The port and key can be changed in  plugins/jsmn/config.yml:
       upload-port: 25580
       upload-api-key: ""
+
+  After changing config.yml, restart the server for the changes to take effect.
 
 
 ================================================================================

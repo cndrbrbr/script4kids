@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSMN – Script Upload</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: #16213e;
+      border: 1px solid #0f3460;
+      border-radius: 12px;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: #e94560;
+      margin-bottom: 0.25rem;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: #888;
+      margin-bottom: 2rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: #aaa;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      background: #0f3460;
+      border: 1px solid #1a4a8a;
+      border-radius: 6px;
+      color: #e0e0e0;
+      font-size: 1rem;
+      margin-bottom: 1.25rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #e94560;
+    }
+
+    .file-area {
+      border: 2px dashed #0f3460;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 1.25rem;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+
+    .file-area:hover, .file-area.drag-over {
+      border-color: #e94560;
+      background: rgba(233,69,96,0.05);
+    }
+
+    .file-area input[type="file"] {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .file-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+
+    .file-label {
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    .file-name {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: #e94560;
+      font-weight: bold;
+      word-break: break-all;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background: #e94560;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover { background: #c73652; }
+    button:disabled { background: #555; cursor: not-allowed; }
+
+    .status {
+      margin-top: 1rem;
+      padding: 0.6rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .status.success { background: #1a4a2a; color: #5dbb6a; display: block; }
+    .status.error   { background: #4a1a1a; color: #e94560; display: block; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>⛏ JSMN Script Upload</h1>
+  <p class="subtitle">Upload a JavaScript file to your personal scripts folder.</p>
+
+  <label for="player">Minecraft username</label>
+  <input type="text" id="player" placeholder="e.g. Steve" autocomplete="off" spellcheck="false">
+
+  <label>Script file (.js)</label>
+  <div class="file-area" id="dropzone">
+    <input type="file" id="fileInput" accept=".js">
+    <div class="file-icon">📂</div>
+    <div class="file-label">Click to choose a file or drag &amp; drop here</div>
+    <div class="file-name" id="fileName"></div>
+  </div>
+
+  <button id="uploadBtn" onclick="upload()" disabled>Upload</button>
+  <div class="status" id="status"></div>
+</div>
+
+<script>
+  const fileInput = document.getElementById('fileInput');
+  const fileNameEl = document.getElementById('fileName');
+  const uploadBtn = document.getElementById('uploadBtn');
+  const playerEl = document.getElementById('player');
+  const statusEl = document.getElementById('status');
+  const dropzone = document.getElementById('dropzone');
+
+  function updateButton() {
+    uploadBtn.disabled = !(fileInput.files.length > 0 && playerEl.value.trim());
+  }
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      fileNameEl.textContent = fileInput.files[0].name;
+    }
+    updateButton();
+  });
+
+  playerEl.addEventListener('input', updateButton);
+
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('drag-over');
+    const dt = e.dataTransfer;
+    if (dt.files.length > 0) {
+      fileInput.files = dt.files;
+      fileNameEl.textContent = dt.files[0].name;
+      updateButton();
+    }
+  });
+
+  async function upload() {
+    const player = playerEl.value.trim();
+    const file = fileInput.files[0];
+    if (!player || !file) return;
+
+    // Derive script name from filename without extension
+    const name = file.name.replace(/\.js$/i, '');
+
+    statusEl.className = 'status';
+    statusEl.textContent = '';
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = 'Uploading…';
+
+    try {
+      const content = await file.text();
+      const apiKey = new URLSearchParams(window.location.search).get('key') || '';
+      const headers = { 'Content-Type': 'text/plain' };
+      if (apiKey) headers['X-Api-Key'] = apiKey;
+
+      const res = await fetch(`/upload?player=${encodeURIComponent(player)}&name=${encodeURIComponent(name)}`, {
+        method: 'POST',
+        headers,
+        body: content
+      });
+
+      const msg = await res.text();
+      if (res.ok) {
+        statusEl.className = 'status success';
+        statusEl.textContent = '✓ ' + msg;
+      } else {
+        statusEl.className = 'status error';
+        statusEl.textContent = '✗ ' + msg;
+      }
+    } catch (err) {
+      statusEl.className = 'status error';
+      statusEl.textContent = '✗ Upload failed: ' + err.message;
+    }
+
+    uploadBtn.disabled = false;
+    uploadBtn.textContent = 'Upload';
+    updateButton();
+  }
+</script>
+</body>
+</html>

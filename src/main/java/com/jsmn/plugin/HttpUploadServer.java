@@ -31,9 +31,29 @@ public class HttpUploadServer {
 
         server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/upload", this::handleUpload);
+        server.createContext("/", this::handlePage);
         server.setExecutor(Executors.newCachedThreadPool());
         server.start();
         logger.info("HTTP upload server started on port " + port);
+    }
+
+    private void handlePage(HttpExchange exchange) throws IOException {
+        if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+            respond(exchange, 405, "text/plain", "Method not allowed.");
+            return;
+        }
+        try (InputStream in = getClass().getResourceAsStream("/upload.html")) {
+            if (in == null) {
+                respond(exchange, 404, "text/plain", "Upload page not found.");
+                return;
+            }
+            byte[] bytes = in.readAllBytes();
+            exchange.getResponseHeaders().add("Content-Type", "text/html; charset=utf-8");
+            exchange.sendResponseHeaders(200, bytes.length);
+            try (OutputStream out = exchange.getResponseBody()) {
+                out.write(bytes);
+            }
+        }
     }
 
     private void handleUpload(HttpExchange exchange) throws IOException {
@@ -104,13 +124,17 @@ public class HttpUploadServer {
         }
     }
 
-    private void respond(HttpExchange exchange, int status, String body) throws IOException {
+    private void respond(HttpExchange exchange, int status, String contentType, String body) throws IOException {
         byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "text/plain; charset=utf-8");
+        exchange.getResponseHeaders().add("Content-Type", contentType + "; charset=utf-8");
         exchange.sendResponseHeaders(status, bytes.length);
         try (OutputStream out = exchange.getResponseBody()) {
             out.write(bytes);
         }
+    }
+
+    private void respond(HttpExchange exchange, int status, String body) throws IOException {
+        respond(exchange, status, "text/plain", body);
     }
 
     private Map<String, String> parseQuery(URI uri) {

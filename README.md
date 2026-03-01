@@ -58,22 +58,22 @@ The plugin runs on standard **OpenJDK 21**. Scripts execute in GraalVM interpret
 
 3. Put `.js` script files into `plugins/jsmn/scripts/`.
 
-### HTTP file upload
+### Script upload page
 
-The plugin starts a small HTTP server on port `25580` (configurable). GUIs and tools can upload scripts directly without pasting:
+The plugin starts a small web server on port `25580` (configurable). Players open it in any browser to upload scripts from their computer:
 
 ```
-POST http://<server>:25580/upload?player=<name>&name=<scriptname>
-Body: script content (plain text)
+http://<server>:25580/
 ```
 
-Example with curl:
-```bash
-curl -X POST "http://localhost:25580/upload?player=Steve&name=myhouse" \
-     --data-binary @myhouse.js
+The page has a Minecraft username field, a file picker (click or drag & drop), and an Upload button. The script name is taken from the filename automatically. After uploading, the script is immediately available via `/runscript`.
+
+If `upload-api-key` is set in `plugins/jsmn/config.yml`, append it to the URL:
+```
+http://<server>:25580/?key=<secret>
 ```
 
-Optionally set `upload-api-key` in `plugins/jsmn/config.yml` to require an `X-Api-Key` header on every request. CORS headers are included so browser-based GUIs can call the endpoint directly.
+The HTTP endpoint (`POST /upload`) also accepts programmatic requests, so the custom GUI can upload files directly without using the browser page. CORS headers are included.
 
 > **Note:** Do not use `/reload` or `/reload confirm`. GraalVM's native library cannot be reloaded in the same JVM process. Always do a full server restart after updating the plugin JAR.
 
