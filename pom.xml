@@ -35,19 +35,21 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- GraalVM Polyglot API -->
+        <!-- GraalVM Polyglot API — provided by GraalVM CE JDK at runtime, not shaded -->
         <dependency>
             <groupId>org.graalvm.polyglot</groupId>
             <artifactId>polyglot</artifactId>
             <version>24.1.2</version>
+            <scope>provided</scope>
         </dependency>
 
-        <!-- GraalVM JavaScript engine (community) -->
+        <!-- GraalVM JavaScript engine (community) — provided by GraalVM CE JDK at runtime, not shaded -->
         <dependency>
             <groupId>org.graalvm.polyglot</groupId>
             <artifactId>js-community</artifactId>
             <version>24.1.2</version>
             <type>pom</type>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
