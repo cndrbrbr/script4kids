@@ -173,7 +173,7 @@ public class DroneAPI {
             for (int dx = -radius; dx <= radius; dx++) {
                 for (int dz = -radius; dz <= radius; dz++) {
                     if ((long) dx * dx + (long) dz * dz <= r2) {
-                        world.getBlockAt(x + dx, y + dy, z + dz).setType(mat);
+                        world.getBlockAt(x + dx, y + dy, z + dz).setType(mat, false);
                     }
                 }
             }
@@ -198,7 +198,7 @@ public class DroneAPI {
                 for (int dz = -radius; dz <= radius; dz++) {
                     long d2 = (long) dx * dx + (long) dz * dz;
                     if (d2 <= outer2 && d2 >= inner2) {
-                        world.getBlockAt(x + dx, y + dy, z + dz).setType(mat);
+                        world.getBlockAt(x + dx, y + dy, z + dz).setType(mat, false);
                     }
                 }
             }
@@ -216,7 +216,7 @@ public class DroneAPI {
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
                 if ((long) dx * dx + (long) dz * dz <= r2) {
-                    world.getBlockAt(x + dx, y, z + dz).setType(mat);
+                    world.getBlockAt(x + dx, y, z + dz).setType(mat, false);
                 }
             }
         }
@@ -236,7 +236,7 @@ public class DroneAPI {
             for (int dz = -radius; dz <= radius; dz++) {
                 long d2 = (long) dx * dx + (long) dz * dz;
                 if (d2 <= outer2 && d2 >= inner2) {
-                    world.getBlockAt(x + dx, y, z + dz).setType(mat);
+                    world.getBlockAt(x + dx, y, z + dz).setType(mat, false);
                 }
             }
         }
@@ -259,13 +259,13 @@ public class DroneAPI {
             int dx = (int) Math.round(Math.cos(angle) * radius);
             int dz = (int) Math.round(Math.sin(angle) * radius);
 
-            world.getBlockAt(x + dx, y + dy, z + dz).setType(mat);
+            world.getBlockAt(x + dx, y + dy, z + dz).setType(mat, false);
 
             // A second block towards the centre makes the staircase easier to walk.
             int innerR = Math.max(1, radius - 1);
             int idx = (int) Math.round(Math.cos(angle) * innerR);
             int idz = (int) Math.round(Math.sin(angle) * innerR);
-            world.getBlockAt(x + idx, y + dy, z + idz).setType(mat);
+            world.getBlockAt(x + idx, y + dy, z + idz).setType(mat, false);
         }
         return this;
     }
@@ -293,7 +293,7 @@ public class DroneAPI {
                         Math.sin(angle * 7.0 - dy * 0.03) * 0.9;
                     double localRadius = baseRadius + ripple;
                     if ((double) dx * dx + (double) dz * dz <= localRadius * localRadius) {
-                        world.getBlockAt(x + dx, y + dy, z + dz).setType(mat);
+                        world.getBlockAt(x + dx, y + dy, z + dz).setType(mat, false);
                     }
                 }
             }
