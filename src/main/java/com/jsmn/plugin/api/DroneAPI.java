@@ -157,6 +157,150 @@ public class DroneAPI {
         return box(material, 1, 1, 1);
     }
 
+    // ── Cylinders, discs and terrain ──────────────────────────────────────────
+
+    /**
+     * Build a filled vertical cylinder centred on the drone's current x/z.
+     * The cylinder grows upward from the drone's current y.
+     */
+    @HostAccess.Export
+    public DroneAPI cylinder(String material, int radius, int height) {
+        if (radius < 1 || height < 1) return this;
+        Material mat = parseMaterial(material);
+        long r2 = (long) radius * radius;
+
+        for (int dy = 0; dy < height; dy++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    if ((long) dx * dx + (long) dz * dz <= r2) {
+                        world.getBlockAt(x + dx, y + dy, z + dz).setType(mat);
+                    }
+                }
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Build a hollow vertical cylinder wall centred on the drone's current x/z.
+     * No floor or roof is added.
+     */
+    @HostAccess.Export
+    public DroneAPI cylinder0(String material, int radius, int height) {
+        if (radius < 1 || height < 1) return this;
+        Material mat = parseMaterial(material);
+        long outer2 = (long) radius * radius;
+        long innerRadius = Math.max(0, radius - 1);
+        long inner2 = innerRadius * innerRadius;
+
+        for (int dy = 0; dy < height; dy++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    long d2 = (long) dx * dx + (long) dz * dz;
+                    if (d2 <= outer2 && d2 >= inner2) {
+                        world.getBlockAt(x + dx, y + dy, z + dz).setType(mat);
+                    }
+                }
+            }
+        }
+        return this;
+    }
+
+    /** Build a filled horizontal disc centred on the drone. */
+    @HostAccess.Export
+    public DroneAPI disc(String material, int radius) {
+        if (radius < 1) return this;
+        Material mat = parseMaterial(material);
+        long r2 = (long) radius * radius;
+
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                if ((long) dx * dx + (long) dz * dz <= r2) {
+                    world.getBlockAt(x + dx, y, z + dz).setType(mat);
+                }
+            }
+        }
+        return this;
+    }
+
+    /** Build a one-block-thick horizontal ring centred on the drone. */
+    @HostAccess.Export
+    public DroneAPI ring(String material, int radius) {
+        if (radius < 1) return this;
+        Material mat = parseMaterial(material);
+        long outer2 = (long) radius * radius;
+        long innerRadius = Math.max(0, radius - 1);
+        long inner2 = innerRadius * innerRadius;
+
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                long d2 = (long) dx * dx + (long) dz * dz;
+                if (d2 <= outer2 && d2 >= inner2) {
+                    world.getBlockAt(x + dx, y, z + dz).setType(mat);
+                }
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Build a one-block-wide spiral staircase around the drone centre.
+     * One stair block is placed per vertical block. The path makes roughly
+     * one full revolution every max(12, radius * 6) blocks of height.
+     */
+    @HostAccess.Export
+    public DroneAPI helix(String material, int radius, int height) {
+        if (radius < 2 || height < 1) return this;
+        Material mat = parseMaterial(material);
+        int stepsPerTurn = Math.max(12, radius * 6);
+
+        for (int dy = 0; dy < height; dy++) {
+            double angle = (2.0 * Math.PI * dy) / stepsPerTurn;
+            int dx = (int) Math.round(Math.cos(angle) * radius);
+            int dz = (int) Math.round(Math.sin(angle) * radius);
+
+            world.getBlockAt(x + dx, y + dy, z + dz).setType(mat);
+
+            // A second block towards the centre makes the staircase easier to walk.
+            int innerR = Math.max(1, radius - 1);
+            int idx = (int) Math.round(Math.cos(angle) * innerR);
+            int idz = (int) Math.round(Math.sin(angle) * innerR);
+            world.getBlockAt(x + idx, y + dy, z + idz).setType(mat);
+        }
+        return this;
+    }
+
+    /**
+     * Build a natural-looking solid mountain centred on the drone.
+     * The mountain has an elliptical/conical profile with deterministic
+     * irregularity, so repeated runs create the same shape.
+     */
+    @HostAccess.Export
+    public DroneAPI mountain(String material, int radius, int height) {
+        if (radius < 4 || height < 2) return this;
+        Material mat = parseMaterial(material);
+
+        for (int dy = 0; dy < height; dy++) {
+            double t = (double) dy / Math.max(1, height - 1);
+            double profile = Math.pow(1.0 - t, 0.72);
+            int baseRadius = Math.max(1, (int) Math.round(radius * profile));
+
+            for (int dx = -baseRadius - 2; dx <= baseRadius + 2; dx++) {
+                for (int dz = -baseRadius - 2; dz <= baseRadius + 2; dz++) {
+                    double angle = Math.atan2(dz, dx);
+                    double ripple =
+                        Math.sin(angle * 3.0 + dy * 0.07) * 1.7 +
+                        Math.sin(angle * 7.0 - dy * 0.03) * 0.9;
+                    double localRadius = baseRadius + ripple;
+                    if ((double) dx * dx + (double) dz * dz <= localRadius * localRadius) {
+                        world.getBlockAt(x + dx, y + dy, z + dz).setType(mat);
+                    }
+                }
+            }
+        }
+        return this;
+    }
+
     // ── Maze ─────────────────────────────────────────────────────────────────
 
     /**
