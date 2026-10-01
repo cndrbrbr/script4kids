@@ -461,6 +461,50 @@ All drone methods return the drone itself, so you can chain calls together:
 
       Places a hollow box (four walls, no floor or ceiling).
 
+  drone.cylinder(material, radius, height)
+
+      Baut einen gefuellten senkrechten Zylinder um die aktuelle Drone-Position.
+
+      Beispiel:
+          drone.cylinder("STONE", 8, 20);
+
+  drone.cylinder0(material, radius, height)
+
+      Baut nur die senkrechte Aussenwand eines Zylinders, ohne Boden und Dach.
+
+      Beispiel:
+          drone.cylinder0("DEEPSLATE_BRICKS", 12, 30);
+
+  drone.disc(material, radius)
+
+      Baut eine gefuellte waagerechte Kreisscheibe.
+
+      Beispiel:
+          drone.disc("SMOOTH_STONE", 10);
+
+  drone.ring(material, radius)
+
+      Baut einen ein Block dicken waagerechten Ring.
+
+      Beispiel:
+          drone.ring("IRON_BLOCK", 8);
+
+  drone.helix(material, radius, height)
+
+      Baut eine spiralförmige Treppe um den Mittelpunkt der Drone.
+
+      Beispiel:
+          drone.helix("STONE_BRICKS", 6, 80);
+
+  drone.mountain(material, radius, height)
+
+      Baut einen massiven, unregelmaessigen Berg. Die Form ist deterministisch:
+      gleiche Position und gleiche Werte ergeben die gleiche Bergform.
+
+      Beispiel:
+          drone.mountain("STONE", 60, 120);
+
+
       Examples:
           drone.box0("STONE_BRICKS", 5, 4, 5); // stone room, open top+bottom
           drone.box0("GLASS", 6, 3, 6);         // glass walls
