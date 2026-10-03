@@ -46,7 +46,9 @@ Thank you, Walter.
 
 JSMN is a standard Spigot plugin. **No modifications to Spigot are needed.**
 
-1. Copy `jsmn-1.0-SNAPSHOT.jar` into the server's `plugins/` folder.
+1. Download the jar for your server from the [Releases](https://github.com/cndrbrbr/Script4kids/releases) page —
+   each Minecraft version has its own release (e.g. `v1.1.0-mc1.21.11` for Spigot 1.21.11 on Java 21,
+   `v1.1.0-mc26.3` for Spigot 26.3 on Java 25) — and copy the jar into the server's `plugins/` folder.
 2. Start the server with the following JVM flags (GraalVM needs access to JDK internals at runtime):
 
 ```bash
@@ -103,9 +105,14 @@ No shared drives, no USB sticks, no copy-pasting. Each participant works in thei
 ## Build
 
 ```bash
-mvn clean package -DskipTests
-cp target/jsmn-1.0-SNAPSHOT.jar /path/to/spigot/plugins/
+mvn clean package -DskipTests              # Spigot 1.21.11 → target/jsmn-<version>-mc1.21.11.jar
+mvn clean package -DskipTests -P mc-26.3   # Spigot 26.3    → target/jsmn-<version>-mc26.3.jar
+cp target/jsmn-*.jar /path/to/spigot/plugins/
 ```
+
+Building the `mc-26.3` profile needs JDK 25+ (Spigot 26.x itself runs on Java 25).
+CI builds both jars on every push. A tag `v<version>-mc<minecraft>` (e.g. `v1.1.0-mc26.3`)
+publishes a separate GitHub Release containing only the jar for that Minecraft version.
 
 ## Commands
 

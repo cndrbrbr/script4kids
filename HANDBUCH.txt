@@ -30,7 +30,9 @@ ScriptCraft repository:  https://github.com/walterhiggins/ScriptCraft
 
 JSMN is a standard Spigot plugin. The Spigot server itself is not modified.
 
-  1. Copy  jsmn-1.0-SNAPSHOT.jar  into the server's  plugins/  folder.
+  1. Download the jar for your server from the GitHub Releases page.
+     Each Minecraft version has its own release (e.g. v1.1.0-mc1.21.11 or
+     v1.1.0-mc26.3). Copy the jar into the server's  plugins/  folder.
 
   2. Start the server with the following JVM flags. These are passed to Java,
      not to Spigot. GraalVM needs them to access JDK internals at runtime.

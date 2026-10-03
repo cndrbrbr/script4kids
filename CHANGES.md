@@ -1,5 +1,31 @@
 # Changes
 
+## 2026-10-03 — v1.1.0
+
+### Added: builds and releases for Spigot 1.21.11 and 26.3
+
+**`pom.xml`**
+- Version `1.0-SNAPSHOT` → `1.1.0`; jar is now `jsmn-<version>-mc<minecraft>.jar`.
+- New Maven profile `mc-26.3` (Spigot 26.3 API, `api-version: 26.3`); the
+  default build still targets 1.21.11. `plugin.yml` version and api-version
+  are filled in by the build.
+- GraalVM `24.1.2` → `25.0.4`. 24.1.2 fails on Java 25 (needed by Spigot 26.x)
+  with `jdk.vm.ci.services.Services does not have member field
+  IS_BUILDING_NATIVE_IMAGE`. 25.0.4 runs on Java 21 and 25.
+- Shade now merges `META-INF/services` and keeps `Multi-Release: true`.
+- Spigot's plugin class loader ignores multi-release jar entries, so Truffle's
+  Java-21 classes under `META-INF/versions/` are copied over their base
+  versions after shading (otherwise GraalVM 25 refuses to start).
+
+**`.github/workflows/build.yml`**
+- CI builds both jars. A tag `v<version>-mc<minecraft>` publishes a separate
+  release for that Minecraft version.
+
+Tested: both jars load and run a script on Spigot 1.21.11 (Java 21) and
+Spigot 26.3 (Java 25).
+
+---
+
 ## 2026-04-12
 
 ### Updated: Spigot API version and Java target

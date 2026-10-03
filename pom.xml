@@ -6,7 +6,7 @@
 
     <groupId>com.jsmn</groupId>
     <artifactId>jsmn</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>jsmn</name>
@@ -17,7 +17,28 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Default target: Minecraft/Spigot 1.21.11. Override with profile mc-26.3 -->
+        <spigot.version>1.21.11-R0.2-SNAPSHOT</spigot.version>
+        <plugin.api-version>1.21.11</plugin.api-version>
+        <mc.classifier>mc1.21.11</mc.classifier>
+
+        <!-- GraalVM 25 runs on both Java 21 and Java 25; 24.x fails on Java 25 (Spigot 26.x). -->
+        <graalvm.version>25.0.4</graalvm.version>
     </properties>
+
+    <profiles>
+        <!-- Minecraft/Spigot 26.3. Building needs JDK 25+ to read the API
+             classfiles; our own bytecode still targets Java 21. -->
+        <profile>
+            <id>mc-26.3</id>
+            <properties>
+                <spigot.version>26.3-R0.1-SNAPSHOT</spigot.version>
+                <plugin.api-version>26.3</plugin.api-version>
+                <mc.classifier>mc26.3</mc.classifier>
+            </properties>
+        </profile>
+    </profiles>
 
     <repositories>
         <repository>
@@ -31,7 +52,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.21.11-R0.2-SNAPSHOT</version>
+            <version>${spigot.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -39,19 +60,40 @@
         <dependency>
             <groupId>org.graalvm.polyglot</groupId>
             <artifactId>polyglot</artifactId>
-            <version>24.1.2</version>
+            <version>${graalvm.version}</version>
         </dependency>
 
         <!-- GraalVM JavaScript engine (community) — shaded into plugin jar -->
         <dependency>
             <groupId>org.graalvm.polyglot</groupId>
             <artifactId>js-community</artifactId>
-            <version>24.1.2</version>
+            <version>${graalvm.version}</version>
             <type>pom</type>
         </dependency>
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}-${project.version}-${mc.classifier}</finalName>
+
+        <resources>
+            <!-- Only plugin.yml is filtered (version, api-version); upload.html
+                 contains JavaScript ${...} template literals that must stay as-is. -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>plugin.yml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>plugin.yml</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
         <plugins>
             <!-- Shade GraalVM into the final jar -->
             <plugin>
@@ -66,6 +108,57 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <!-- Required for GraalVM 25 in an uber jar: merge service
+                                 registrations and keep the Multi-Release manifest flag. -->
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Multi-Release>true</Multi-Release>
+                                    </manifestEntries>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Spigot's plugin class loader reads plugin jars without multi-release
+                 support, so Truffle's Java-version-specific classes under
+                 META-INF/versions/ would never be loaded and GraalVM refuses to
+                 start. Copy them over their base versions after shading. Both
+                 target servers run on Java 21+, so the versions/21 classes fit. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>flatten-multi-release</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <property name="mr.jar" value="${project.build.directory}/${project.build.finalName}.jar"/>
+                                <property name="mr.dir" value="${project.build.directory}/multi-release"/>
+                                <delete dir="${mr.dir}"/>
+                                <unzip src="${mr.jar}" dest="${mr.dir}">
+                                    <patternset>
+                                        <include name="META-INF/versions/*/com/**"/>
+                                    </patternset>
+                                </unzip>
+                                <!-- unzip keeps the old timestamps; without a touch, zip's
+                                     update mode would treat them as stale and skip them. -->
+                                <touch>
+                                    <fileset dir="${mr.dir}"/>
+                                </touch>
+                                <zip destfile="${mr.jar}" update="true">
+                                    <fileset dir="${mr.dir}/META-INF/versions/9"/>
+                                    <fileset dir="${mr.dir}/META-INF/versions/21"/>
+                                </zip>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>
