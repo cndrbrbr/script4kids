@@ -1,4 +1,8 @@
-# JSMN — JavaScript in Minecraft
+<p align="center">
+  <img src="logo.svg" width="128" height="128" alt="script4kids logo">
+</p>
+
+<h1 align="center">JSMN — JavaScript in Minecraft</h1>
 
 A Spigot plugin that lets pupils write and run JavaScript files directly inside
 a Minecraft server. Scripts can interact with the world, build structures,
